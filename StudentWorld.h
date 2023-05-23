@@ -21,6 +21,8 @@ public:
 
 	virtual int init()
 	{
+		Actor* sampleIce = new Ice(1,1);
+		Actor* sampleIceman = new Iceman(this);
 		return GWSTATUS_CONTINUE_GAME;
 	}
 
@@ -28,8 +30,9 @@ public:
 	{
 		// This code is here merely to allow the game to build, run, and terminate after you hit enter a few times.
 		// Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
-		decLives();
-		return GWSTATUS_PLAYER_DIED;
+		//decLives();
+		//return GWSTATUS_PLAYER_DIED;
+		return GWSTATUS_CONTINUE_GAME;
 	}
 
 	virtual void cleanUp()
@@ -38,7 +41,7 @@ public:
 
 
 private:
-	std::vector<Object> game_objects;
+	std::vector<Actor*> game_objects;
 };
 
 #endif // STUDENTWORLD_H_

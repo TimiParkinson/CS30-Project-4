@@ -5,64 +5,62 @@
 
 class StudentWorld;
 
-class Actor : public GraphObject{
+class Actor : public GraphObject {
 public:
 	Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) 
-		: GraphObject(imageID, startX, startY, dir, size, depth), isVisible(false) {}
+		: GraphObject(imageID, startX, startY, dir, size, depth) {}
 	~Actor() {}
-
-	void setVisible(bool visible) {
-		isVisible = visible;
-	}
 	
-	virtual void doSomething() = 0;
+	virtual void onTick() = 0;
 
 private:
-	bool isVisible;
-
 };
 
 #pragma region Entities
 class Entity : public Actor {
 public:
-	Entity(int imageID, int startX, int startY) : Actor(imageID, startX, startY) {}
+	Entity(int imageID, int startX, int startY): Actor(imageID, startX, startY) {}
 	~Entity() {}
 };
 
 class Iceman : public Entity {
 public:
-	Iceman(StudentWorld* swP) : Entity(IID_PLAYER, 30, 60), studentWrldPtr(swP) { setVisible(true); }
+	Iceman(StudentWorld* sp = nullptr): Entity(IID_PLAYER, 30, 60), m_studentWptr(sp) { setVisible(true); }
 	~Iceman() {}
 
-	void doSomething() {
-		moveTo(getX() + 1, getY() + 1);
-	}
+	StudentWorld* getWorld();
+	void onTick();
 
 private:
-	StudentWorld* studentWrldPtr;
-
+	StudentWorld* m_studentWptr;
 };
 #pragma endregion Entities
 
 #pragma region GameObjects
 class Object : public Actor {
 public:
-	Object(int imageID, int startX = 0, int startY = 0): Actor(imageID, startX, startY) {}
+	Object(int imageID, int startX = 0, int startY = 0, Direction dir = right, double size = 1.0, unsigned int depth = 0): 
+		Actor(imageID, startX, startY, dir, size, depth) {}
 	~Object(){}
 };
 
 class Terrain : public Object {
 public:
-	Terrain(int imageID, int startX, int startY) : Object(imageID, startX, startY) {}
+	Terrain(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0): 
+		Object(imageID, startX, startY, dir, size, depth) {}
 	Terrain(int imageID) : Object(imageID) {}
 	~Terrain() {}
 };
 
 class Ice : public Terrain {
 public:
-	Ice(int startX, int startY) : Terrain(IID_ICE, startX, startY) {}
+	Ice(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 3):
+		Terrain(IID_ICE, startX, startY, dir, size, depth) {
+		setVisible(true);
+		//std::cout << "created ICE" << std::endl;
+	}
 	~Ice() {}
-
+	void onTick() {}
 };
 #pragma endregion GameObjects
 

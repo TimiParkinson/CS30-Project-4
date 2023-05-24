@@ -54,7 +54,7 @@ public:
 
 class Ice : public Terrain {
 public:
-	Ice(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 3):
+	Ice(int startX, int startY, Direction dir = right, double size = .25, unsigned int depth = 3):
 		Terrain(IID_ICE, startX, startY, dir, size, depth) {
 		setVisible(true);
 		//std::cout << "created ICE" << std::endl;

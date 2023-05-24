@@ -21,7 +21,25 @@ public:
 
 	virtual int init()
 	{
-		Actor* sampleIce = new Ice(1,1);
+		int y;
+		int x;
+
+		for (y = 4; y <= 59; y++)
+		{
+			for (x = 1; x <= 29; x++)
+			{
+				game_objects.push_back(new Ice(x, y));
+			}
+		} 
+
+		for (y = 4; y <= 59; y++)
+		{
+			for (x = 34; x <= 60; x++)
+			{
+				game_objects.push_back(new Ice(x, y));
+			}
+		}
+
 		Actor* sampleIceman = new Iceman(this);
 		return GWSTATUS_CONTINUE_GAME;
 	}

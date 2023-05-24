@@ -10,7 +10,7 @@ public:
 	Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : GraphObject(imageID, startX, startY, dir, size, depth) {}
 	~Actor() {}
 
-	virtual void onTick() = 0;
+	virtual void doSomething() = 0;
 };
 
 #pragma region Entities
@@ -28,7 +28,7 @@ public:
 	~Iceman() {}
 
 	StudentWorld* getWorld() const;
-	void onTick();
+	void doSomething();
 };
 #pragma endregion Entities
 
@@ -53,7 +53,7 @@ public:
 		//std::cout << "created ICE" << std::endl;
 	}
 	~Ice() {}
-	void onTick() {}
+	void doSomething() {}
 };
 #pragma endregion GameObjects
 

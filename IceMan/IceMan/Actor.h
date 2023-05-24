@@ -7,54 +7,67 @@ class StudentWorld;
 
 class Actor : public GraphObject {
 public:
-	Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : GraphObject(imageID, startX, startY, dir, size, depth) {}
-	~Actor() {}
-
-	virtual void doSomething() = 0;
+    Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0)
+        : GraphObject(imageID, startX, startY, dir, size, depth) {}
+    virtual ~Actor() {}
+    
+    virtual void doSomething() = 0;
 };
 
 #pragma region Entities
 class Entity : public Actor {
 public:
-	Entity(int imageID, int startX, int startY) : Actor(imageID, startX, startY) {}
-	~Entity() {}
+    Entity(int imageID, int startX, int startY): Actor(imageID, startX, startY) {}
+    virtual ~Entity() {}
+    
+    virtual void doSomething() = 0;
 };
 
 class Iceman : public Entity {
 private:
-	StudentWorld* m_studentWorldPointer;
+    StudentWorld* m_studentWorldPointer;
 public:
-	Iceman(StudentWorld* sp = nullptr): Entity(IID_PLAYER, 30, 60), m_studentWorldPointer(sp) { setVisible(true); }
-	~Iceman() {}
+    Iceman(StudentWorld* sp = nullptr) : Entity(IID_PLAYER, 30, 60), m_studentWorldPointer(sp) { setVisible(true); }
+    virtual ~Iceman() {}
 
-	StudentWorld* getWorld() const;
-	void doSomething();
+    StudentWorld* getWorld() const noexcept;
+    void doSomething();
 };
 #pragma endregion Entities
 
 #pragma region GameObjects
 class Object : public Actor {
 public:
-	Object(int imageID, int startX = 0, int startY = 0, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Actor(imageID, startX, startY, dir, size, depth) {}
-	~Object(){}
+    Object(int imageID, int startX = 0, int startY = 0, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Actor(imageID, startX, startY, dir, size, depth) {}
+    virtual ~Object(){}
+    
+    virtual void doSomething() = 0;
 };
 
 class Terrain : public Object {
 public:
-	Terrain(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Object(imageID, startX, startY, dir, size, depth) {}
-	Terrain(int imageID) : Object(imageID) {}
-	~Terrain() {}
+    Terrain(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Object(imageID, startX, startY, dir, size, depth) {}
+    Terrain(int imageID) : Object(imageID) {}
+    virtual ~Terrain() {}
+    
+    virtual void doSomething() = 0;
 };
 
 class Ice : public Terrain {
 public:
-	Ice(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 3) : Terrain(IID_ICE, startX, startY, dir, size, depth) {
-		setVisible(true);
-		//std::cout << "created ICE" << std::endl;
-	}
-	~Ice() {}
-	void doSomething() {}
+    Ice(int startX, int startY, Direction dir = right, double size = .25, unsigned int depth = 3) : Terrain(IID_ICE, startX, startY, dir, size, depth) {
+        setVisible(true);
+        //std::cout << "created ICE" << std::endl;
+    }
+    virtual ~Ice() {}
+    void doSomething() {}
 };
 #pragma endregion GameObjects
+
+
+
+
+
+// Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
 
 #endif // ACTOR_H_

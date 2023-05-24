@@ -1,3 +1,5 @@
+.gitignore
+
 freeglut.h
 freeglut_ext.h
 freeglut_std.h
@@ -18,3 +20,4 @@ irrKlang/
 Assets/
 IceMan.vcxproj
 IceMan.vcxproj.user
+.DS_Store

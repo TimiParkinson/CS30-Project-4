@@ -9,15 +9,22 @@ void Iceman::onTick() {
 	int ch;
 	if (getWorld()->getKey(ch)) {
 		switch (ch) {
-		case KEY_PRESS_LEFT:
-			moveTo(getX() - 1, getY());
-			break;
-		case KEY_PRESS_RIGHT:
-			moveTo(getX() + 1, getY());
-			break;
-		//case KEY_PRESS_SPACE:
-		//	// add a squirt in front of the player
-		//	break;
+			case KEY_PRESS_LEFT:
+				moveTo(getX() - 1, getY());
+				break;
+			case KEY_PRESS_RIGHT:
+				moveTo(getX() + 1, getY());
+				break;
+			case KEY_PRESS_UP:
+				moveTo(getX(), getY() + 1);
+				break;
+			case KEY_PRESS_DOWN:
+				moveTo(getX(), getY() - 1);
+				break;
+			//case KEY_PRESS_SPACE:
+			//	// add a squirt in front of the player
+			//	break;
 		}
+		m_studentWorldPointer->removeIce();
 	}
 }

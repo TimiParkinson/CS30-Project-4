@@ -31,9 +31,9 @@ class StudentWorld : public GameWorld {
 	 public:
 		GameStats(/*StudentWorld* stw */) /*: m_level(stw->getLevel()), m_lives(stw->getLives()), m_score(stw->getScore())*/ {}
 		void init() noexcept {
-			m_boulders = min(m_level / 2 + 2, 9);
-			m_gold = max(5 - m_level / 2, 2);
-			m_barrels = min(2 + m_level, 21);
+			m_boulders = std::min(m_level / 2 + 2, 9);
+			m_gold = std::max(5 - m_level / 2, 2);
+			m_barrels = std::min(2 + m_level, 21);
 		}
 		std::string toString() {
 			return "<game statistics>";
@@ -59,9 +59,13 @@ class StudentWorld : public GameWorld {
 
 	virtual int move();
 
-	virtual void cleanUp();
+	virtual void cleanUp() noexcept;
 
-	~StudentWorld() {}
+	void removeIce() noexcept;
+
+	~StudentWorld() {
+		cleanUp();
+	}
 };
 
 #endif // STUDENTWORLD_H_

@@ -12,6 +12,7 @@
 class Actor;
 class Iceman;
 class Ice;
+class Boulder;
 
 // Students:  Add code to this file, StudentWorld.cpp, Actor.h, and Actor.cpp
 
@@ -43,7 +44,7 @@ private:
 	GameStats m_stats;
 	Iceman* m_iceMan;
 	std::unordered_set<Actor*> m_actors;
-	std::array<std::array<Ice*, 60>, 60> m_oilField;
+	std::array<std::array<Ice*, 64>, 64> m_oilField;
 
 public:
 	StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceMan(nullptr) {
@@ -64,7 +65,7 @@ public:
 
 	void removeIce() noexcept;
 
-	~StudentWorld() {}
+	~StudentWorld() { cleanUp(); }
 };
 
 #endif // STUDENTWORLD_H_

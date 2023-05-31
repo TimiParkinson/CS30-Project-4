@@ -11,7 +11,7 @@ public:
 		: GraphObject(imageID, startX, startY, dir, size, depth) {}
 	~Actor() {}
 	
-	virtual void onTick() = 0;
+	virtual void doSomething() = 0;
 
 private:
 };
@@ -29,7 +29,7 @@ public:
 	~Iceman() {}
 
 	StudentWorld* getWorld();
-	void onTick();
+	void doSomething();
 
 private:
 	StudentWorld* m_studentWptr;
@@ -46,7 +46,7 @@ public:
 
 class Terrain : public Object {
 public:
-	Terrain(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0): 
+	Terrain(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : 
 		Object(imageID, startX, startY, dir, size, depth) {}
 	Terrain(int imageID) : Object(imageID) {}
 	~Terrain() {}
@@ -54,13 +54,23 @@ public:
 
 class Ice : public Terrain {
 public:
-	Ice(int startX, int startY, Direction dir = right, double size = .25, unsigned int depth = 3):
+	Ice(int startX, int startY, Direction dir = right, double size = .25, unsigned int depth = 3) :
 		Terrain(IID_ICE, startX, startY, dir, size, depth) {
 		setVisible(true);
 		//std::cout << "created ICE" << std::endl;
 	}
 	~Ice() {}
-	void onTick() {}
+	void doSomething() {}
+};
+
+class Boulder : public Terrain {
+public:
+	Boulder(int startX, int startY, Direction dir = down, double size = 1.0, unsigned int depth = 1) :
+		Terrain(IID_BOULDER, startX, startY, dir, size, depth) {
+		setVisible(true);
+	}
+	~Boulder() {}
+	void doSomething() {}
 };
 #pragma endregion GameObjects
 

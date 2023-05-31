@@ -6,7 +6,7 @@ StudentWorld* Iceman::getWorld()
 	return m_studentWptr;
 }
 
-void Iceman::onTick()
+void Iceman::doSomething()
 {
 	int ch;
 	if (getWorld()->getKey(ch))
@@ -14,17 +14,48 @@ void Iceman::onTick()
 		switch (ch)
 		{ 
 		case KEY_PRESS_LEFT:
-			moveTo(getX() - 1, getY());
-			break;
+			if(getDirection() == left && getX() > 0)
+			{
+				moveTo(getX() - 1, getY());
+				break;
+			}
+			else
+			{
+				setDirection(left);
+				break;
+			}
 		case KEY_PRESS_RIGHT:
-			moveTo(getX() + 1, getY());
-			break;
+			if (getDirection() == right && getX() < 60)
+			{
+				moveTo(getX() + 1, getY());
+				break;
+			}
+			else {
+				setDirection(right);
+				break;
+			}
 		case KEY_PRESS_UP:
-			moveTo(getX(), getY() + 1);
-			break;
+			if (getDirection() == up && getY() < 60)
+			{
+				moveTo(getX(), getY() + 1);
+				break;
+			}
+			else
+			{
+				setDirection(up);
+				break;
+			}
 		case KEY_PRESS_DOWN:
-			moveTo(getX(), getY() - 1);
-			break;
+			if (getDirection() == down && getY() > 0)
+			{
+				moveTo(getX(), getY() - 1);
+				break;
+			}
+			else
+			{
+				setDirection(down);
+				break;
+			}
 		//case KEY_PRESS_SPACE:
 		//	// add a squirt in front of the player
 		//	break;

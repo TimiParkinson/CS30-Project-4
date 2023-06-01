@@ -86,8 +86,8 @@ void StudentWorld::removeIce() noexcept {
 
 	for (int i = m_iceMan->getX(); i <= endX; i++) {
 		for (int j = m_iceMan->getY(); j <= endY; j++) {
-			cout << "iceMan x: " << m_iceMan->getX() << " iceMan y: " << m_iceMan->getY() << endl;
-			cout << "i: " << i << " j: " << j << endl << endl;
+			//cout << "iceMan x: " << m_iceMan->getX() << " iceMan y: " << m_iceMan->getY() << endl;
+			//cout << "i: " << i << " j: " << j << endl << endl;
 			if (m_oilField[i][j] != nullptr) {
 				m_oilField[i][j]->setVisible(false);
 				delete m_oilField[i][j];

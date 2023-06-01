@@ -18,8 +18,9 @@ class Boulder;
 
 class StudentWorld : public GameWorld {
 private:
+	#pragma region GameStats
 	class GameStats {
-	private:
+	 private:
 		int m_level;
 		int m_lives;
 		int m_score;
@@ -30,42 +31,56 @@ private:
 		int m_sonar;
 
 		int m_boulders;
-	public:
-		GameStats(/*StudentWorld* stw */) /*: m_level(stw->getLevel()), m_lives(stw->getLives()), m_score(stw->getScore())*/ {}
-		void init() noexcept {
-			m_boulders = std::min(m_level / 2 + 2, 9);
-			m_gold = std::max(5 - m_level / 2, 2);
-			m_barrels = std::min(2 + m_level, 21);
-		}
-		std::string toString() {
-			return "<game statistics>";
-		}
+	 public:
+		GameStats(StudentWorld* stw ) : m_level(stw->getLevel()), m_lives(stw->getLives()), m_score(stw->getScore()) {}
+		void init() noexcept;
+		std::string toString() const noexcept;
 	};
+	#pragma endregion GameStats
+	#pragma region OilField
+	class OilField {
+	 private:
+	 	std::array<std::array<Ice*, 64>, 64> self;
+	 public:
+		 OilField();
+        ~OilField();
+
+        void cleanUp() noexcept;
+		std::array<std::array<Ice*, 64>, 64> getField();
+        void removeIce(int x, int y) noexcept;
+		void init();
+	};
+	#pragma endregion OilField
+	#pragma region Stage
+	class Stage {
+	 private:
+	 	std::unordered_set<Actor*> self;
+
+	 public:
+		 Stage();
+        ~Stage();
+
+        void cleanUp() noexcept;
+        void addActor(Actor* actor) noexcept;
+        void removeActor(Actor* actor) noexcept;
+        void init(OilField myField);
+        void move();
+	};
+	#pragma endregion Stage
+	
 	GameStats m_stats;
-	Iceman* m_iceMan;
-	std::unordered_set<Actor*> m_actors;
-	std::array<std::array<Ice*, 64>, 64> m_oilField;
+	Stage m_stage;
+	Iceman* m_iceman;
 
 public:
-	StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceMan(nullptr) {
-		for (auto i : m_actors) {
-			i = nullptr;
-		}
-		for (auto& i : m_oilField) {
-			for (auto& j : i)
-				j = nullptr;
-		}
-	}
-
-	virtual int init();
-
-	virtual int move();
-
-	virtual void cleanUp() noexcept;
-
+	StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceman(nullptr), m_stats(this) {}
+	virtual ~StudentWorld() { cleanUp(); }
+	virtual int init() override;
+	virtual int move() override;
+	virtual void cleanUp() noexcept override;
 	void removeIce() noexcept;
 
-	~StudentWorld() { cleanUp(); }
+	OilField m_oilField;
 };
 
 #endif // STUDENTWORLD_H_

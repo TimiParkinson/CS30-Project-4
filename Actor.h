@@ -9,7 +9,7 @@ class Actor : public GraphObject {
 public:
 	Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) 
 		: GraphObject(imageID, startX, startY, dir, size, depth) {}
-	~Actor() {}
+	virtual ~Actor() {}
 	
 	virtual void doSomething() = 0;
 
@@ -20,19 +20,20 @@ private:
 class Entity : public Actor {
 public:
 	Entity(int imageID, int startX, int startY): Actor(imageID, startX, startY) {}
-	~Entity() {}
+	virtual ~Entity() {}
+	virtual void doSomething() = 0;							   
 };
 
-class Iceman : public Entity {
+class Iceman : public Entity {									
 public:
-	Iceman(StudentWorld* sp = nullptr): Entity(IID_PLAYER, 30, 60), m_studentWptr(sp) { setVisible(true); }
-	~Iceman() {}
+	Iceman(StudentWorld* sp = nullptr): Entity(IID_PLAYER, 30, 60), m_studentWorldPointer(sp) { setVisible(true); }
+	virtual ~Iceman() {}
 
-	StudentWorld* getWorld();
+	StudentWorld* getWorld() const noexcept;
 	void doSomething();
 
 private:
-	StudentWorld* m_studentWptr;
+	StudentWorld* m_studentWorldPointer;
 };
 #pragma endregion Entities
 
@@ -41,7 +42,8 @@ class Object : public Actor {
 public:
 	Object(int imageID, int startX = 0, int startY = 0, Direction dir = right, double size = 1.0, unsigned int depth = 0): 
 		Actor(imageID, startX, startY, dir, size, depth) {}
-	~Object(){}
+	virtual ~Object(){}
+	virtual void doSomething() = 0;
 };
 
 class Terrain : public Object {
@@ -49,7 +51,8 @@ public:
 	Terrain(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : 
 		Object(imageID, startX, startY, dir, size, depth) {}
 	Terrain(int imageID) : Object(imageID) {}
-	~Terrain() {}
+	virtual ~Terrain() {}
+	virtual void doSomething() = 0;					   
 };
 
 class Ice : public Terrain {
@@ -57,9 +60,8 @@ public:
 	Ice(int startX, int startY, Direction dir = right, double size = .25, unsigned int depth = 3) :
 		Terrain(IID_ICE, startX, startY, dir, size, depth) {
 		setVisible(true);
-		//std::cout << "created ICE" << std::endl;
 	}
-	~Ice() {}
+	virtual ~Ice() {}
 	void doSomething() {}
 };
 
@@ -69,7 +71,7 @@ public:
 		Terrain(IID_BOULDER, startX, startY, dir, size, depth) {
 		setVisible(true);
 	}
-	~Boulder() {}
+	virtual ~Boulder() {}
 	void doSomething() {}
 };
 #pragma endregion GameObjects

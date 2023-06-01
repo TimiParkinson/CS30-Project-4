@@ -1,9 +1,9 @@
 #include "Actor.h"
 #include "StudentWorld.h"
 
-StudentWorld* Iceman::getWorld() 
+StudentWorld* Iceman::getWorld() const noexcept
 {
-	return m_studentWptr;
+	return m_studentWorldPointer;
 }
 
 void Iceman::doSomething()

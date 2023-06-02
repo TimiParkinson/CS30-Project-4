@@ -6,15 +6,6 @@ GameWorld* createStudentWorld(string assetDir) {
 	return new StudentWorld(assetDir);
 }
 
-std::mt19937 generator { std::random_device{}() };
-std::uniform_int_distribution<> distribution { 0, MAX_SIZE };
-auto get_random = std::bind(distribution, generator);
-pair<int, int> getRandomPosition() {
-	int x = get_random();
-	int y = get_random();
-	return std::make_pair(x, y);
-}
-
 #pragma region StudentWorld
 StudentWorld::~StudentWorld() {
     delete m_iceman;
@@ -25,7 +16,7 @@ int StudentWorld::init() {
 	//initialize stats
 	m_stats.init();
 
-	//initialize stage for actors
+	//initialize actors
 	m_stage.init();
 
 	//construct oil field
@@ -59,15 +50,15 @@ void StudentWorld::cleanUp() noexcept {
 }
 
 void StudentWorld::removeIce() noexcept {
-	auto wasIceRemoved = [this]() -> bool {
+	auto iceRemoved = [this]() -> bool {
 		int deletedSomething = false;
-		int endX = max(0, min(m_iceman->getX() + 3, 59)); //no lower than 0, no higher than 59
-		int endY = max(0, min(m_iceman->getY() + 3, 59)); //no lower than 0, no higher than 59
+		int endX = max(0, min(m_iceman->getX() + 3, ICE_WIDTH - 1)); //no lower than 0, no higher than ICE_WIDTH - 1
+		int endY = max(0, min(m_iceman->getY() + 3, ICE_HEIGHT - 1)); //no lower than 0, no higher than ICE_HEIGHT - 1
 
 		for (int i = m_iceman->getX(); i <= endX; i++) {
 			for (int j = m_iceman->getY(); j <= endY; j++) {
-				i = max(0, min(i, 59)); //prevents rebounding
-				j = max(0, min(j, 59)); //prevents rebounding
+				i = max(0, min(i, ICE_WIDTH - 1)); //prevents rebounding
+				j = max(0, min(j, ICE_HEIGHT - 1)); //prevents rebounding
 				if (m_oilField.isIce(i, j)) {
 					deletedSomething = true;
 				}
@@ -76,7 +67,7 @@ void StudentWorld::removeIce() noexcept {
 		}
 		return deletedSomething;
 	};
-	if (wasIceRemoved()) {
+	if (iceRemoved()) {
 		playSound(SOUND_DIG);
 	}
 }
@@ -139,7 +130,7 @@ void StudentWorld::OilField::cleanUp() noexcept {
     }
 }
 void StudentWorld::OilField::removeIce(int x, int y) noexcept {
-    if (x >= 0 && x <= 59) {
+    if ((x >= 0 && x <= ICE_WIDTH - 1) && (y >= 0 && y <= ICE_HEIGHT - 1))  {
         if (self[x][y] != nullptr) {
             self[x][y]->setVisible(false);
             delete self[x][y];
@@ -149,7 +140,7 @@ void StudentWorld::OilField::removeIce(int x, int y) noexcept {
 }
 
 bool StudentWorld::OilField::isIce(int x, int y) const noexcept {
-	if (x >= 0 && x <= 59) {
+	if ((x >= 0 && x <= ICE_WIDTH - 1) && (y >= 0 && y <= ICE_HEIGHT - 1)) {
 		if (self[x][y] != nullptr) {
 			return true;
 		}
@@ -158,9 +149,9 @@ bool StudentWorld::OilField::isIce(int x, int y) const noexcept {
 }
 
 void StudentWorld::OilField::init() {
-   for (int x = 0; x < 60; x++) {
-		for (int y = 0; y < 60; y++){
-			if (m_iceBlackList.isListed(x, y)) {
+   for (int x = 0; x < ICE_WIDTH; x++) {
+		for (int y = 0; y < ICE_HEIGHT; y++){
+			if ((x >= 30 && x <= 33) && (y >= 4 && y <= ICE_HEIGHT - 1)) {
 				continue;
 			}
 			self[x][y] = new Ice(x, y);
@@ -183,19 +174,17 @@ void StudentWorld::Stage::cleanUp() noexcept {
         i = nullptr;
     }
 }
-void StudentWorld::Stage::spawnActor(Actor* actor) noexcept {
-    self.insert(actor);
-}
-void StudentWorld::Stage::spawnActor(Boulder* boulder) noexcept {
-	pair<int, int> randomPosition = getRandomPosition();
+template <>
+void StudentWorld::Stage::spawnActor<Boulder>() noexcept {
+	std::pair<int, int> randomPosition = getRandomPosition();
 
-	if (m_boulderBlackList.isListed(randomPosition)) {
-		boulder->moveTo(randomPosition.first, randomPosition.second);
+	if (!m_boulderBlackList.isListed(randomPosition)) {
 		m_boulderBlackList.add(randomPosition);
-		self.insert(boulder);
+		self.insert(new Boulder(randomPosition.first, randomPosition.second));
+		return;
 	}
 
-	spawnActor(boulder);
+	spawnActor<Boulder>();
 }
 void StudentWorld::Stage::removeActor(Actor* actor) noexcept {
     self.erase(actor);
@@ -203,7 +192,7 @@ void StudentWorld::Stage::removeActor(Actor* actor) noexcept {
 void StudentWorld::Stage::init() {
 
 	for (int i = 0; i < m_studentWorldPointer->m_stats.getBoulders(); i++) {
-		spawnActor(new Boulder);
+		spawnActor<Boulder>();
 	}
 }
 void StudentWorld::Stage::move() {

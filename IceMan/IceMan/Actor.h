@@ -83,7 +83,7 @@ class Boulder : public Terrain {
 	 	State() {}
 		State(Boulder* boulder) : m_boulderPointer(boulder) {}
 		virtual void doSomething() = 0;
-		virtual ~State();
+        virtual ~State() {}
 	};
 	class Idle : public State {
 	 private:
@@ -91,6 +91,7 @@ class Boulder : public Terrain {
 	 public:
 		Idle(Boulder* boulder) : m_boulderPointer(boulder) {}
 		virtual void doSomething() override;
+        virtual ~Idle() {}
 	};
 	class Waiting: public State {
 	 private:
@@ -98,6 +99,7 @@ class Boulder : public Terrain {
 	 public:
 		Waiting(Boulder* boulder) : m_boulderPointer(boulder) {}
 		virtual void doSomething() override;
+        virtual ~Waiting() {}
 	};
 	class Falling : public State {
 	 private:
@@ -105,6 +107,7 @@ class Boulder : public Terrain {
 	 public:
 		Falling(Boulder* boulder) : m_boulderPointer(boulder) {}
 		virtual void doSomething() override;
+        virtual ~Falling() {}
 	};
 	#pragma endregion State
 	State* m_state;

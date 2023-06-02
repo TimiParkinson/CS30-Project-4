@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include <ranges>
+//#include <ranges> [[NO XCODE SUPPORT]]
 #include <random>
 #include <functional>
 
@@ -48,10 +48,12 @@ class StudentWorld : public GameWorld {
 			}
 		}
 		bool isListed (std::pair<int, int> p) {
-			return std::ranges::find(m_positions, p) != m_positions.end();
+			//return std::ranges::find(m_positions, p) != m_positions.end(); [[NO XCODE SUPPORT]]
+            return std::find(m_positions.begin(), m_positions.end(), p) != m_positions.end();
 		}
 		bool isListed (int x, int y) {
-			return std::ranges::find(m_positions, std::make_pair(x, y)) != m_positions.end();
+			//return std::ranges::find(m_positions, std::make_pair(x, y)) != m_positions.end(); [[NO XCODE SUPPORT]]
+            return std::find(m_positions.begin(), m_positions.end(), std::make_pair(x,y)) != m_positions.end();
 		}
 	};
 

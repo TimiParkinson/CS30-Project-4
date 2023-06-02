@@ -1,14 +1,21 @@
 #include "StudentWorld.h"
 #include "Actor.h"
-#include <string>
 using namespace std;
 
 GameWorld* createStudentWorld(string assetDir) {
 	return new StudentWorld(assetDir);
 }
 
-//StudentWolrd Implementation
+std::mt19937 generator { std::random_device{}() };
+std::uniform_int_distribution<> distribution { 0, MAX_SIZE };
+auto get_random = std::bind(distribution, generator);
+pair<int, int> getRandomPosition() {
+	int x = get_random();
+	int y = get_random();
+	return std::make_pair(x, y);
+}
 
+#pragma region StudentWorld
 StudentWorld::~StudentWorld() {
     delete m_iceman;
     m_iceman = nullptr;
@@ -52,32 +59,70 @@ void StudentWorld::cleanUp() noexcept {
 }
 
 void StudentWorld::removeIce() noexcept {
-	int endX = max(0, min(m_iceman->getX() + 3, 59)); //no lower than 0, no higher than 59
-	int endY = max(0, min(m_iceman->getY() + 3, 59)); //no lower than 0, no higher than 59
+	auto wasIceRemoved = [this]() -> bool {
+		int deletedSomething = false;
+		int endX = max(0, min(m_iceman->getX() + 3, 59)); //no lower than 0, no higher than 59
+		int endY = max(0, min(m_iceman->getY() + 3, 59)); //no lower than 0, no higher than 59
 
-	for (int i = m_iceman->getX(); i <= endX; i++) {
-		for (int j = m_iceman->getY(); j <= endY; j++) {
-			cout << "iceMan x: " << m_iceman->getX() << " iceMan y: " << m_iceman->getY() << endl;
-            i = max(0, min(i, 59)); //prevents rebounding
-            j = max(0, min(j, 59)); //prevents rebounding
-			cout << "i: " << i << " j: " << j << endl << endl;
-			m_oilField.removeIce(i, j);
+		for (int i = m_iceman->getX(); i <= endX; i++) {
+			for (int j = m_iceman->getY(); j <= endY; j++) {
+				i = max(0, min(i, 59)); //prevents rebounding
+				j = max(0, min(j, 59)); //prevents rebounding
+				if (m_oilField.isIce(i, j)) {
+					deletedSomething = true;
+				}
+				m_oilField.removeIce(i, j);
+			}
 		}
+		return deletedSomething;
+	};
+	if (wasIceRemoved()) {
+		playSound(SOUND_DIG);
 	}
 }
+#pragma endregion StudentWorld
 
-//GameStats Implementation
+#pragma region GameStats
 void StudentWorld::GameStats::init() noexcept {
-    m_boulders = min(m_level / 2 + 2, 9);
-    m_gold = max(5 - m_level / 2, 2);
-    m_barrels = min(2 + m_level, 21);
+    m_boulderCount = min(m_levelCount / 2 + 2, 9);
+    m_goldCount = max(5 - m_levelCount / 2, 2);
+    m_barrelCount = min(2 + m_levelCount, 21);
 }
 string StudentWorld::GameStats::toString() const noexcept {
     return "<game statistics>";
 }
 
-//OilField Implementation
+// Getters
+int StudentWorld::GameStats::getLevel() const noexcept {
+	return m_levelCount;
+}
+int StudentWorld::GameStats::getLives() const noexcept {
+	return m_lifeCount;
+}
+int StudentWorld::GameStats::getScore() const noexcept {
+	return m_scoreCount;
+}
+int StudentWorld::GameStats::getHealth() const noexcept {
+	return m_healthCount;
+}
+int StudentWorld::GameStats::getSquirts() const noexcept {
+	return m_squirtCount;
+}
+int StudentWorld::GameStats::getGold() const noexcept {
+	return m_goldCount;
+}
+int StudentWorld::GameStats::getBarrels() const noexcept {
+	return m_barrelCount;
+}
+int StudentWorld::GameStats::getSonar() const noexcept {
+	return m_sonarCount;
+}
+int StudentWorld::GameStats::getBoulders() const noexcept {
+	return m_boulderCount;
+}
+#pragma endregion GameStats
 
+#pragma region OilField
 StudentWorld::OilField::~OilField() {
     for (auto& i : self) {
         for (auto& j : i)
@@ -103,18 +148,28 @@ void StudentWorld::OilField::removeIce(int x, int y) noexcept {
     }
 }
 
+bool StudentWorld::OilField::isIce(int x, int y) const noexcept {
+	if (x >= 0 && x <= 59) {
+		if (self[x][y] != nullptr) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void StudentWorld::OilField::init() {
    for (int x = 0; x < 60; x++) {
 		for (int y = 0; y < 60; y++){
-			if ((x >= 30 && x <= 33) && (y >= 4 && y <= 59)) {
+			if (m_iceBlackList.isListed(x, y)) {
 				continue;
 			}
 			self[x][y] = new Ice(x, y);
 		}
 	}
 }
+#pragma endregion OilField
 
-//Stage Implementation
+#pragma region Stage
 StudentWorld::Stage::~Stage() {
     for (auto i : self) {
         delete i;
@@ -128,11 +183,32 @@ void StudentWorld::Stage::cleanUp() noexcept {
         i = nullptr;
     }
 }
-void StudentWorld::Stage::addActor(Actor* actor) noexcept {
+void StudentWorld::Stage::spawnActor(Actor* actor) noexcept {
     self.insert(actor);
+}
+void StudentWorld::Stage::spawnActor(Boulder* boulder) noexcept {
+	pair<int, int> randomPosition = getRandomPosition();
+
+	if (m_boulderBlackList.isListed(randomPosition)) {
+		boulder->moveTo(randomPosition.first, randomPosition.second);
+		m_boulderBlackList.add(randomPosition);
+		self.insert(boulder);
+	}
+
+	spawnActor(boulder);
 }
 void StudentWorld::Stage::removeActor(Actor* actor) noexcept {
     self.erase(actor);
 }
-void StudentWorld::Stage::init() {}
-void StudentWorld::Stage::move() {}
+void StudentWorld::Stage::init() {
+
+	for (int i = 0; i < m_studentWorldPointer->m_stats.getBoulders(); i++) {
+		spawnActor(new Boulder);
+	}
+}
+void StudentWorld::Stage::move() {
+	for (auto i : self) {
+		i->doSomething();
+	}
+}
+#pragma endregion Stage

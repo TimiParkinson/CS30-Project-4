@@ -3,6 +3,7 @@
 
 #include "GameWorld.h"
 #include "GameConstants.h"
+#include <iostream>
 #include <algorithm>
 #include <array>
 #include <unordered_set>
@@ -18,7 +19,22 @@ class Iceman;
 class Ice;
 class Boulder;
 
-constexpr int MAX_SIZE = 64;
+constexpr int ICE_WIDTH = 64;
+constexpr int ICE_HEIGHT = 60;
+
+#pragma region RandomPosition
+std::mt19937 generatorX { std::random_device{}() };
+std::uniform_int_distribution<> distributionX { 0, ICE_WIDTH - 1 };
+auto get_randomX = std::bind(distributionX, generatorX);
+std::mt19937 generatorY { std::random_device{}() };
+std::uniform_int_distribution<> distributionY { 0, ICE_HEIGHT - 1 };
+auto get_randomY = std::bind(distributionY, generatorY);
+std::pair<int, int> getRandomPosition() {
+	int x = get_randomX();
+	int y = get_randomY();
+	return std::make_pair(x, y);
+}
+#pragma endregion Utilities
 
 class StudentWorld : public GameWorld {
  private:
@@ -26,7 +42,7 @@ class StudentWorld : public GameWorld {
 	template <typename T>
 	class BlackList {
 	 private:
-		std::array<std::pair<int, int>, MAX_SIZE> m_positions;
+		std::array<std::pair<int, int>, ICE_WIDTH * ICE_HEIGHT> m_positions;
 	 public:
 		BlackList() {
 			init();
@@ -34,10 +50,11 @@ class StudentWorld : public GameWorld {
 		virtual ~BlackList() {}
 
 		void init () {
-			for (int x = 0; x < MAX_SIZE; x++) {
-				for (int y = 0; y < MAX_SIZE; y++){
-					if ((x >= 30 && x <= 33) && (y >= 4 && y <= MAX_SIZE - 1)) {
+			for (int x = 0; x < ICE_WIDTH; x++) {
+				for (int y = 0; y < ICE_HEIGHT; y++){
+					if (((x >= 30 && x <= 33) && (y >= 4 && y <= ICE_HEIGHT - 1)) || y <= 59) {
 						m_positions[m_positions.size() - 1] = std::make_pair(x, y);
+						std::cout << "Blacklisted at " << x << ", " << y << std::endl;
 					}
 				}
 			}
@@ -53,14 +70,14 @@ class StudentWorld : public GameWorld {
 		}
 		bool isListed (int x, int y) {
 			//return std::ranges::find(m_positions, std::make_pair(x, y)) != m_positions.end(); [[NO XCODE SUPPORT]]
-            return std::find(m_positions.begin(), m_positions.end(), std::make_pair(x,y)) != m_positions.end();
+            return std::find(m_positions.begin(), m_positions.end(), std::make_pair(x, y)) != m_positions.end();
 		}
 	};
 
 	template <>
 	class BlackList<Boulder> : public BlackList<BlackList<Boulder>> {
 	 private:
-		std::array<std::pair<int, int>, MAX_SIZE> m_positions;
+		std::array<std::pair<int, int>, ICE_WIDTH * ICE_HEIGHT> m_positions;
 		const int m_boulderPadding = 6;
 	 public:
 		BlackList() {
@@ -118,7 +135,7 @@ class StudentWorld : public GameWorld {
 	#pragma region OilField
 	class OilField {
 	 private:
-	 	std::array<std::array<Ice*, MAX_SIZE>, MAX_SIZE> self;
+	 	std::array<std::array<Ice*, ICE_HEIGHT>, ICE_WIDTH> self;
 		BlackList<Ice> m_iceBlackList;
 	 public:
 		OilField() {
@@ -142,8 +159,12 @@ class StudentWorld : public GameWorld {
 		BlackList<Boulder> m_boulderBlackList;
 	 	std::unordered_set<Actor*> self;
 		StudentWorld* m_studentWorldPointer;
-		void spawnActor(Actor* actor) noexcept;
-		void spawnActor(Boulder* boulder) noexcept;
+		template <typename T>
+		void spawnActor() noexcept;
+		template <typename T>
+		void spawnActor(Actor* actor) noexcept {
+			self.insert(actor);
+		}
         void removeActor(Actor* actor) noexcept;
 	 public:
 		Stage(StudentWorld* swp) : m_studentWorldPointer(swp) {

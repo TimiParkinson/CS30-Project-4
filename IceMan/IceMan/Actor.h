@@ -112,7 +112,7 @@ class Boulder : public Terrain {
 	#pragma endregion State
 	State* m_state;
  public:
-	Boulder(int startX = 0, int startY = 0, Direction dir = right, double size = 1.0, unsigned int depth = 1) : Terrain(IID_BOULDER, startX, startY, dir, size, depth), m_state(new Idle(this)) {
+	Boulder(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 1) : Terrain(IID_BOULDER, startX, startY, dir, size, depth), m_state(new Idle(this)) {
 		setVisible(true);
 	}
 	virtual ~Boulder();

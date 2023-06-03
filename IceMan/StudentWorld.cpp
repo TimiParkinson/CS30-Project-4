@@ -6,6 +6,22 @@ GameWorld* createStudentWorld(string assetDir) {
 	return new StudentWorld(assetDir);
 }
 
+#pragma region Utilities
+std::mt19937 generatorX { std::random_device{}() };
+std::uniform_int_distribution<> distributionX { 0, ICE_WIDTH - 1 };
+auto get_randomX = std::bind(distributionX, generatorX);
+
+std::mt19937 generatorY { std::random_device{}() };
+std::uniform_int_distribution<> distributionY { 0, ICE_HEIGHT - 1 };
+auto get_randomY = std::bind(distributionY, generatorY);
+
+std::pair<int, int> getRandomPosition() {
+    int x = get_randomX();
+    int y = get_randomY();
+    return std::make_pair(x, y);
+}
+#pragma endregion Utilities
+
 #pragma region StudentWorld
 StudentWorld::~StudentWorld() {
     delete m_iceman;
@@ -179,17 +195,26 @@ void StudentWorld::Stage::cleanUp() noexcept {
         i = nullptr;
     }
 }
+template <typename T>
+inline T* StudentWorld::Stage::spawnActor() {
+	T* newActor = new T();
+	self.insert(newActor);
+	return newActor;
+}
 template <>
-void StudentWorld::Stage::spawnActor<Boulder>() noexcept {
-	std::pair<int, int> randomPosition = getRandomPosition();
+inline Boulder*  StudentWorld::Stage::spawnActor<Boulder>() {
+    static Boulder* newBoulder = nullptr;
+	pair<int, int> randomPosition = getRandomPosition();
 
 	if (!m_boulderBlackList.isListed(randomPosition)) {
 		m_boulderBlackList.add(randomPosition);
-		self.insert(new Boulder(randomPosition.first, randomPosition.second));
-		return;
+		newBoulder = new Boulder(randomPosition.first, randomPosition.second);
+		self.insert(newBoulder);
+		return newBoulder;
 	}
 
 	spawnActor<Boulder>();
+    return newBoulder;
 }
 void StudentWorld::Stage::removeActor(Actor* actor) noexcept {
     self.erase(actor);

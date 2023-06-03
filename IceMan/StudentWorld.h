@@ -22,19 +22,7 @@ class Boulder;
 constexpr int ICE_WIDTH = 64;
 constexpr int ICE_HEIGHT = 60;
 
-#pragma region RandomPosition
-std::mt19937 generatorX { std::random_device{}() };
-std::uniform_int_distribution<> distributionX { 0, ICE_WIDTH - 1 };
-auto get_randomX = std::bind(distributionX, generatorX);
-std::mt19937 generatorY { std::random_device{}() };
-std::uniform_int_distribution<> distributionY { 0, ICE_HEIGHT - 1 };
-auto get_randomY = std::bind(distributionY, generatorY);
-std::pair<int, int> getRandomPosition() {
-    int x = get_randomX();
-    int y = get_randomY();
-    return std::make_pair(x, y);
-}
-#pragma endregion Utilities
+std::pair<int, int> getRandomPosition();
 
 class StudentWorld : public GameWorld {
  private:
@@ -157,14 +145,12 @@ class StudentWorld : public GameWorld {
     class Stage {
      private:
         BlackList<Boulder> m_boulderBlackList;
-         std::unordered_set<Actor*> self;
+        std::unordered_set<Actor*> self;
         StudentWorld* m_studentWorldPointer;
         template <typename T>
-        void spawnActor() noexcept;
-        template <typename T>
-        void spawnActor(Actor* actor) noexcept {
-            self.insert(actor);
-        }
+        inline T* spawnActor();
+        template <>
+        inline Boulder* spawnActor<Boulder>();
         void removeActor(Actor* actor) noexcept;
      public:
         Stage(StudentWorld* swp) : m_studentWorldPointer(swp) {

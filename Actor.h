@@ -6,11 +6,12 @@
 class StudentWorld;
 
 class Actor : public GraphObject {
+ private:
+    std::string name = "Actor";
  public:
-    Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0)
-        : GraphObject(imageID, startX, startY, dir, size, depth) {}
+    Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : GraphObject(imageID, startX, startY, dir, size, depth) {}
     virtual ~Actor() {}
-
+    std::string getActorType() const noexcept { return name; }
     virtual void doSomething() = 0;
 };
 
@@ -27,6 +28,8 @@ private:
 };
 
 class Iceman : public Entity {
+ private:
+    std::string name = "Iceman";
  public:
 	Iceman(StudentWorld* sp = nullptr) : Entity(IID_PLAYER, 30, 60, right, sp, 10) {}
 	virtual ~Iceman() {}
@@ -35,6 +38,8 @@ class Iceman : public Entity {
 };
 
 class Protestor : public Entity {
+ private:
+    std::string name = "Protestor";
  public:
 	Protestor(StudentWorld* sp = nullptr, Iceman* im = nullptr) : Entity(IID_PROTESTER, 60, 60, left, sp, 5), iceman(im) {}
 	Protestor(StudentWorld* sp, Iceman* im, const int imageID, unsigned int health) : Entity(imageID, 60, 60, left, sp, health), iceman(im) {}
@@ -51,6 +56,8 @@ class Protestor : public Entity {
 };
 
 class HardcoreProtestor : public Protestor {
+ private:
+    std::string name = "HardcoreProtestor";
  public:
 	HardcoreProtestor(StudentWorld* sp = nullptr, Iceman* im = nullptr) : Protestor(sp, im, IID_HARD_CORE_PROTESTER, 20) {}
 	virtual ~HardcoreProtestor() {};
@@ -77,18 +84,11 @@ class Terrain : public Object {
     virtual void doSomething() = 0;
 };
 
-class Interactable : public Object {
- public:
-    Interactable(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) :
-        Object(imageID, startX, startY, dir, size, depth) {}
-    Interactable(int imageID) : Object(imageID) {}
-    virtual ~Interactable() {}
-    virtual void doSomething() = 0;
-};
-
 class Ice : public Terrain {
+ private:
+    std::string name = "Ice";
  public:
-    Ice(int startX, int startY, Direction dir = right, double size = .25, unsigned int depth = 3) : Terrain(IID_ICE, startX, startY, dir, size, depth) {}
+    Ice(int startX, int startY, Direction dir = right, double size = .25, unsigned int depth = 3) : Terrain(IID_ICE, startX, startY, dir, size, depth) { setVisible(true); }
     virtual ~Ice() {}
     virtual void doSomething() override {}
 };
@@ -131,17 +131,27 @@ class Boulder : public Terrain {
     };
     #pragma endregion State
     State* m_state;
+    std::string name = "Boulder";
  public:
-    Boulder(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 1) : Terrain(IID_BOULDER, startX, startY, dir, size, depth), m_state(new Idle(this)) {
-        setVisible(true);
-    }
+    Boulder(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 1) : Terrain(IID_BOULDER, startX, startY, dir, size, depth), m_state(new Idle(this)) { setVisible(true); }
     virtual ~Boulder();
 
     void setState(std::string s);
     virtual void doSomething() override;
 };
 
+class Interactable : public Object {
+ public:
+    Interactable(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) :
+        Object(imageID, startX, startY, dir, size, depth) {}
+    Interactable(int imageID) : Object(imageID) {}
+    virtual ~Interactable() {}
+    virtual void doSomething() = 0;
+};
+
 class OilBarrel : public Interactable {
+ private:
+    std::string name = "OilBarrel";
 public:
     OilBarrel(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
         Interactable(IID_BARREL, startX, startY, dir, size, depth) {
@@ -152,6 +162,8 @@ public:
 };
 
 class GoldNugget : public Interactable {
+ private:
+    std::string name = "GoldNugget";
 public:
     GoldNugget(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
         Interactable(IID_GOLD, startX, startY, dir, size, depth) {}
@@ -161,6 +173,8 @@ public:
 };
 
 class SonarKit : public Interactable {
+ private:
+    std::string name = "SonarKit";
 public:
     SonarKit(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
         Interactable(IID_SONAR, startX, startY, dir, size, depth) {
@@ -172,6 +186,8 @@ public:
 };
 
 class WaterPool : public Interactable {
+ private:
+    std::string name =      "WaterPool";
 public:
     WaterPool(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
         Interactable(IID_WATER_POOL, startX, startY, dir, size, depth) {

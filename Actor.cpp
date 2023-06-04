@@ -46,7 +46,7 @@ void Iceman::doSomething() {
         //    // add a squirt in front of the player
         //    break;
         }
-        getWorld()->removeIce();
+        getWorld()->removeIce<Iceman>();
     }
 }
 #pragma endregion Iceman

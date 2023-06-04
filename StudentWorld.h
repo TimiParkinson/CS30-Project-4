@@ -13,6 +13,8 @@
 //#include <ranges> [[NO XCODE SUPPORT]]
 #include <random>
 #include <functional>
+#include <exception>
+#include <typeinfo>
 
 class Actor;
 class Iceman;
@@ -42,7 +44,6 @@ class StudentWorld : public GameWorld {
                 for (int y = 0; y < ICE_HEIGHT; y++) {
                     if (((x >= 30 && x <= 33) && (y >= 4 && y <= ICE_HEIGHT - 1)) || y <= 59) {
                         m_positions[m_positions.size() - 1] = std::make_pair(x, y);
-                        std::cout << "Blacklisted at " << x << ", " << y << std::endl;
                     }
                 }
             }
@@ -173,13 +174,18 @@ class StudentWorld : public GameWorld {
     Iceman* m_iceman;
 
 public:
-	  StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceman(nullptr), m_stats(this), m_stage(this) {}
-      virtual ~StudentWorld() override;
-	  virtual int init() override;
-	  virtual int move() override;
-	  virtual void cleanUp() noexcept override;
-	  void removeIce() noexcept;
-	  bool isIce(int x, int y) const noexcept;
+    StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceman(nullptr), m_stats(this), m_stage(this) {}
+    virtual ~StudentWorld() override;
+    virtual int init() override;
+    virtual int move() override;
+    virtual void cleanUp() noexcept override;
+    template<typename T>
+    inline void removeIce(Actor* actor) noexcept;
+    template <typename T>
+    inline void removeIce() noexcept { throw std::invalid_argument("void StudentWorld::removeIce<T>() does not exist"); }
+    template <>
+    void removeIce<Iceman>() noexcept;
+    bool isIce(int x, int y) const noexcept;
 };
 
 #endif // STUDENTWORLD_H_

@@ -2,7 +2,6 @@
 #include "Actor.h"
 using namespace std;
 
-Protestor* m_Protestor;
 
 GameWorld* createStudentWorld(string assetDir) {
 	return new StudentWorld(assetDir);
@@ -45,7 +44,6 @@ int StudentWorld::init() {
 	//allocate and insert iceman
 	m_iceman = new Iceman(this);
 
-	m_Protestor = new Protestor(this, m_iceman);
 	//HardcoreProtestor* m_HardcoreProtestor = new HardcoreProtestor();
 
 	return GWSTATUS_CONTINUE_GAME;
@@ -61,8 +59,6 @@ int StudentWorld::move() {
 	//Give player a chance to do something
 	m_iceman->doSomething();
 
-	m_Protestor->doSomething();
-
 	// Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
 	return GWSTATUS_CONTINUE_GAME;
 }
@@ -73,8 +69,31 @@ void StudentWorld::cleanUp() noexcept {
     m_oilField.cleanUp();
 	m_stage.cleanUp();
 }
+template<typename T>
+inline void StudentWorld::removeIce(Actor* actor) noexcept {
+	auto iceRemoved = [this, &actor]() -> bool {
+		int deletedSomething = false;
+		int endX = max(0, min(actor->getX() + 3, ICE_WIDTH - 1)); //no lower than 0, no higher than ICE_WIDTH - 1
+		int endY = max(0, min(actor->getY() + 3, ICE_HEIGHT - 1)); //no lower than 0, no higher than ICE_HEIGHT - 1
 
-void StudentWorld::removeIce() noexcept {
+		for (int i = actor->getX(); i <= endX; i++) {
+			for (int j = actor->getY(); j <= endY; j++) {
+				i = max(0, min(i, ICE_WIDTH - 1)); //prevents rebounding
+				j = max(0, min(j, ICE_HEIGHT - 1)); //prevents rebounding
+				if (m_oilField.isIce(i, j)) {
+					deletedSomething = true;
+				}
+				m_oilField.removeIce(i, j);
+			}
+		}
+		return deletedSomething;
+	};
+	if (iceRemoved()) {
+		//do something?
+	}
+}
+template<>
+void StudentWorld::removeIce<Iceman>() noexcept {
 	auto iceRemoved = [this]() -> bool {
 		int deletedSomething = false;
 		int endX = max(0, min(m_iceman->getX() + 3, ICE_WIDTH - 1)); //no lower than 0, no higher than ICE_WIDTH - 1
@@ -192,9 +211,10 @@ void StudentWorld::OilField::init() {
 #pragma endregion OilField
 
 #pragma region Stage
+//FIXME: deleting actors causes EXC_BAD_ACCESS
 StudentWorld::Stage::~Stage() {
 	for (auto i : self) {
-
+        cout << i->getActorType() << endl;
         delete i;
 		i = nullptr;
 	}
@@ -207,20 +227,21 @@ void StudentWorld::Stage::cleanUp() noexcept {
 	}
 }
 template <typename T>
-T* StudentWorld::Stage::spawnActor() {
+inline T* StudentWorld::Stage::spawnActor() {
 	T* newActor = new T();
 	self.insert(newActor);
 	return newActor;
 }
 template <>
-Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
+inline Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
 	static Boulder* newBoulder = nullptr;
 	pair<int, int> randomPosition = getRandomPosition();
 
 	if (!m_boulderBlackList.isListed(randomPosition)) {
 		m_boulderBlackList.add(randomPosition);
 		newBoulder = new Boulder(randomPosition.first, randomPosition.second);
-		self.insert(newBoulder);
+		m_studentWorldPointer->removeIce<Boulder>(newBoulder);
+		//self.insert(newBoulder);
 		return newBoulder;
 	}
 	spawnActor<Boulder>();
@@ -239,7 +260,6 @@ void StudentWorld::Stage::removeActor(Actor* actor) noexcept {
 	self.erase(actor);
 }
 void StudentWorld::Stage::init() {
-
 	for (int i = 0; i < m_studentWorldPointer->m_stats.getBoulders(); i++) {
 		spawnActor<Boulder>();
 	}

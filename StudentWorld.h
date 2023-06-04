@@ -18,6 +18,7 @@ class Actor;
 class Iceman;
 class Ice;
 class Boulder;
+class OilBarrel;
 
 constexpr int ICE_WIDTH = 64;
 constexpr int ICE_HEIGHT = 60;
@@ -151,6 +152,7 @@ class StudentWorld : public GameWorld {
         T* spawnActor();
         template <>
         Boulder* spawnActor<Boulder>();
+        template <>
         OilBarrel* spawnActor<OilBarrel>();
         void removeActor(Actor* actor) noexcept;
      public:

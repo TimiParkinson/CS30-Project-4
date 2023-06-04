@@ -148,10 +148,10 @@ class StudentWorld : public GameWorld {
         std::unordered_set<Actor*> self;
         StudentWorld* m_studentWorldPointer;
         template <typename T>
-        inline T* spawnActor();
+        T* spawnActor();
         template <>
-        inline Boulder* spawnActor<Boulder>();
-        //inline OilBarrel* spawnActor<OilBarrel>();
+        Boulder* spawnActor<Boulder>();
+        OilBarrel* spawnActor<OilBarrel>();
         void removeActor(Actor* actor) noexcept;
      public:
         Stage(StudentWorld* swp) : m_studentWorldPointer(swp) {
@@ -173,13 +173,13 @@ class StudentWorld : public GameWorld {
     Iceman* m_iceman;
 
 public:
-	  StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceman(nullptr), m_stats(this), m_stage(this) {}
-      virtual ~StudentWorld() override;
-	  virtual int init() override;
-	  virtual int move() override;
-	  virtual void cleanUp() noexcept override;
-	  void removeIce() noexcept;
-	  bool isIce(int x, int y) const noexcept;
+	StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceman(nullptr), m_stats(this), m_stage(this) {}
+	virtual ~StudentWorld() override;
+	virtual int init() override;
+	virtual int move() override;
+	virtual void cleanUp() noexcept override;
+	void removeIce() noexcept;
+	bool isIce(int x, int y) const noexcept;
 };
 
 #endif // STUDENTWORLD_H_

@@ -44,6 +44,7 @@ int StudentWorld::init() {
 
 	//allocate and insert iceman
 	m_iceman = new Iceman(this);
+	m_squirt = nullptr;
 
 	m_Protestor = new Protestor(this, m_iceman);
 	//HardcoreProtestor* m_HardcoreProtestor = new HardcoreProtestor();
@@ -59,7 +60,11 @@ int StudentWorld::move() {
 	m_stage.move();
 
 	//Give player a chance to do something
-	m_iceman->doSomething();
+	m_iceman->doSomething(m_squirt);
+	if (m_squirt != nullptr && !m_squirt->isAlive()) {
+		delete m_squirt;
+		m_squirt = nullptr;
+	}
 
 	m_Protestor->doSomething();
 
@@ -101,6 +106,10 @@ bool StudentWorld::isIce(int x, int y) const noexcept {
 	return m_oilField.isIce(x, y);
 }
 
+void StudentWorld::createSquirt(int x, int y) noexcept {
+	playSound(SOUND_PLAYER_SQUIRT);
+	m_squirt = new Squirt(x, y);
+}
 #pragma endregion StudentWorld
 
 #pragma region GameStats

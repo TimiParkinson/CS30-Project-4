@@ -6,7 +6,11 @@ StudentWorld* Entity::getWorld() const noexcept {
 }
 
 #pragma region Iceman
-void Iceman::doSomething() {
+void Iceman::doSomething(Squirt* sq) {
+	if (sq != nullptr) {
+		sq->doSomething(getDirection());
+	}
+
     int ch;
     if (getWorld()->getKey(ch)) {
         switch (ch) {
@@ -42,9 +46,9 @@ void Iceman::doSomething() {
                 setDirection(down);
                 break;
             }
-        //case KEY_PRESS_SPACE:
-        //    // add a squirt in front of the player
-        //    break;
+        case KEY_PRESS_SPACE:
+			getWorld()->createSquirt(getX(), getY());
+			break;
         }
         getWorld()->removeIce();
     }
@@ -192,3 +196,39 @@ void Boulder::Falling::doSomething() {
 #pragma endregion Falling
 #pragma endregion State
 #pragma endregion Boulder
+
+void Squirt::doSomething(Direction dir) {
+	if (cooldown == 0) {
+		if (getDirection() == none) {
+			setDirection(dir);
+		}
+		if (isVisible() == false) {
+			setVisible(true);
+		}
+		if (getDirection() == up) {
+			if (getY() < 60-1) {
+				moveTo(getX(), getY() + 2);
+			}
+		} else if (getDirection() == right) {
+			if (getX() < 60-1) {
+				moveTo(getX() + 2, getY());
+			}
+		} else if (getDirection() == down) {
+			if (getY() > 0+1) {
+				moveTo(getX(), getY() - 2);
+			}
+		} else {
+			if (getX() > 0+1) {
+				moveTo(getX() - 2, getY());
+			}
+		}
+		--remaining;
+		cooldown = 10;
+	} else {
+		--cooldown;
+	}
+}
+
+bool Squirt::isAlive() {
+	return (remaining != 0);
+}

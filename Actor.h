@@ -67,22 +67,13 @@ class Object : public Actor {
 
     virtual void doSomething() = 0;
 };
-
+#pragma region Terrain
 class Terrain : public Object {
  public:
-    Terrain(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Object(imageID, startX, startY, dir, size, depth) {}
+    Terrain(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Object(imageID, startX, startY, dir, size, depth) { setVisible(true); }
     Terrain(int imageID) : Object(imageID) {}
     virtual ~Terrain() {}
 
-    virtual void doSomething() = 0;
-};
-
-class Interactable : public Object {
- public:
-    Interactable(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) :
-        Object(imageID, startX, startY, dir, size, depth) {}
-    Interactable(int imageID) : Object(imageID) {}
-    virtual ~Interactable() {}
     virtual void doSomething() = 0;
 };
 
@@ -132,20 +123,28 @@ class Boulder : public Terrain {
     #pragma endregion State
     State* m_state;
  public:
-    Boulder(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 1) : Terrain(IID_BOULDER, startX, startY, dir, size, depth), m_state(new Idle(this)) {
-        setVisible(true);
-    }
+    Boulder(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 1) : Terrain(IID_BOULDER, startX, startY, dir, size, depth), m_state(new Idle(this)) {}
     virtual ~Boulder();
 
     void setState(std::string s);
     virtual void doSomething() override;
+};
+#pragma endregion Terrain
+#pragma region Interactable
+class Interactable : public Object {
+ public:
+    Interactable(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) :
+        Object(imageID, startX, startY, dir, size, depth) {}
+    Interactable(int imageID) : Object(imageID) {}
+    virtual ~Interactable() {}
+    virtual void doSomething() = 0;
 };
 
 class OilBarrel : public Interactable {
 public:
     OilBarrel(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
         Interactable(IID_BARREL, startX, startY, dir, size, depth) {
-        setVisible(false);
+        setVisible(true); // Remove after testing, unintended behavior
     }
     virtual ~OilBarrel() {}
     virtual void doSomething() {}
@@ -154,7 +153,9 @@ public:
 class GoldNugget : public Interactable {
 public:
     GoldNugget(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
-        Interactable(IID_GOLD, startX, startY, dir, size, depth) {}
+        Interactable(IID_GOLD, startX, startY, dir, size, depth) {
+        setVisible(true); // Remove after testing, unintended behavior
+    }
 
     virtual ~GoldNugget() {}
     virtual void doSomething() {}
@@ -164,7 +165,7 @@ class SonarKit : public Interactable {
 public:
     SonarKit(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
         Interactable(IID_SONAR, startX, startY, dir, size, depth) {
-        setVisible(true);
+        setVisible(true); // Remove after testing, unintended behavior
     }
 
     virtual ~SonarKit() {}
@@ -180,5 +181,6 @@ public:
     virtual ~WaterPool() {}
     virtual void doSomething() {}
 };
+#pragma endregion Interactable
 #pragma endregion Objects
 #endif // ACTOR_H_

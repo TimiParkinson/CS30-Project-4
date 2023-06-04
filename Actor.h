@@ -57,8 +57,8 @@ public:
 
 class Terrain : public Object {
 public:
-    Terrain(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Object(imageID, startX, startY, dir, size, depth) {}
-    Terrain(int imageID) : Object(imageID) {}
+    Terrain(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Object(imageID, startX, startY, dir, size, depth) { setVisible(true); }
+    Terrain(int imageID) : Object(imageID) { setVisible(true); }
     virtual ~Terrain() {}
 
     virtual void doSomething() = 0;
@@ -75,9 +75,7 @@ public:
 
 class Ice : public Terrain {
 public:
-    Ice(int startX, int startY, Direction dir = right, double size = .25, unsigned int depth = 3) : Terrain(IID_ICE, startX, startY, dir, size, depth) {
-        setVisible(true);
-    }
+    Ice(int startX, int startY, Direction dir = right, double size = .25, unsigned int depth = 3) : Terrain(IID_ICE, startX, startY, dir, size, depth) {}
     virtual ~Ice() {}
     virtual void doSomething() override {}
 };
@@ -121,9 +119,7 @@ private:
 #pragma endregion State
     State* m_state;
 public:
-    Boulder(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 1) : Terrain(IID_BOULDER, startX, startY, dir, size, depth), m_state(new Idle(this)) {
-        setVisible(true);
-    }
+    Boulder(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 1) : Terrain(IID_BOULDER, startX, startY, dir, size, depth), m_state(new Idle(this)) {}
     virtual ~Boulder();
 
     void setState(std::string s);
@@ -139,9 +135,37 @@ public:
     virtual ~OilBarrel() {}
     virtual void doSomething() {}
 };
+
+class GoldNugget : public Interactable {
+public:
+    GoldNugget(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
+        Interactable(IID_GOLD, startX, startY, dir, size, depth) {}
+
+    virtual ~GoldNugget() {}
+    virtual void doSomething() {}
+};
+
+class SonarKit : public Interactable {
+public:
+    SonarKit(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
+        Interactable(IID_SONAR, startX, startY, dir, size, depth) {
+        setVisible(true);
+    }
+
+    virtual ~SonarKit() {}
+    virtual void doSomething() {}
+};
+
+class WaterPool : public Interactable {
+public:
+    WaterPool(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
+        Interactable(IID_WATER_POOL, startX, startY, dir, size, depth) {
+        setVisible(true);
+    }
+    virtual ~WaterPool() {}
+    virtual void doSomething() {}
+};
 #pragma endregion Objects
-
-
 
 
 // Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp

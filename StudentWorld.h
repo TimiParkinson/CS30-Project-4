@@ -152,6 +152,7 @@ private:
         inline T* spawnActor();
         template <>
         inline Boulder* spawnActor<Boulder>();
+        inline OilBarrel* spawnActor<OilBarrel>();
         void removeActor(Actor* actor) noexcept;
     public:
         Stage(StudentWorld* swp) : m_studentWorldPointer(swp) {

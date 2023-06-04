@@ -212,10 +212,18 @@ inline Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
 		self.insert(newBoulder);
 		return newBoulder;
 	}
-
 	spawnActor<Boulder>();
 	return newBoulder;
 }
+
+//inline OilBarrel* StudentWorld::Stage::spawnActor<OilBarrel>() {
+//	static OilBarrel* newOilBarrel = nullptr;
+//	pair<int, int> randomPosition = getRandomPosition();
+//
+//	if()
+//}
+
+
 void StudentWorld::Stage::removeActor(Actor* actor) noexcept {
 	self.erase(actor);
 }

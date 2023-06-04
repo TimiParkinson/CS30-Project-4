@@ -133,11 +133,7 @@ class Boulder : public Terrain {
     State* m_state;
     std::string name = "Boulder";
  public:
-<<<<<<< HEAD
     Boulder(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 1) : Terrain(IID_BOULDER, startX, startY, dir, size, depth), m_state(new Idle(this)) { setVisible(true); }
-=======
-    Boulder(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 1) : Terrain(IID_BOULDER, startX, startY, dir, size, depth), m_state(new Idle(this)) {}
->>>>>>> a170b73 (Fixed visual bugs and compilation errors)
     virtual ~Boulder();
 
     void setState(std::string s);
@@ -147,21 +143,12 @@ class Boulder : public Terrain {
 #pragma region Interactable
 class Interactable : public Object {
  public:
-    Interactable(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) :
-        Object(imageID, startX, startY, dir, size, depth) {}
+    Interactable(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Object(imageID, startX, startY, dir, size, depth) {}
     Interactable(int imageID) : Object(imageID) {}
     virtual ~Interactable() {}
     virtual void doSomething() = 0;
 };
 
-class Interactable : public Object {
- public:
-    Interactable(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) :
-        Object(imageID, startX, startY, dir, size, depth) {}
-    Interactable(int imageID) : Object(imageID) {}
-    virtual ~Interactable() {}
-    virtual void doSomething() = 0;
-};
 
 class OilBarrel : public Interactable {
  private:

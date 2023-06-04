@@ -13,7 +13,7 @@ std::mt19937 generatorX { std::random_device{}() };
 std::uniform_int_distribution<> distributionX { 0, ICE_WIDTH - 1 };
 auto get_randomX = std::bind(distributionX, generatorX);
 
-std::mt19937 generatorY { std::random_device{}() };
+std::mt19937 generatorY { std::random_device{}() };	
 std::uniform_int_distribution<> distributionY { 0, ICE_HEIGHT - 1 };
 auto get_randomY = std::bind(distributionY, generatorY);
 

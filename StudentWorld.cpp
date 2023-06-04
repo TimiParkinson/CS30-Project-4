@@ -5,6 +5,8 @@
 #include <stdlib.h>
 using namespace std;
 
+Protestor* m_Protestor;
+
 GameWorld* createStudentWorld(string assetDir) {
 	return new StudentWorld(assetDir);
 }
@@ -20,6 +22,9 @@ int StudentWorld::init() {
 	//allocate and insert iceman
 	m_iceman = new Iceman(this);
 
+	m_Protestor = new Protestor(this, m_iceman);
+	//HardcoreProtestor* m_HardcoreProtestor = new HardcoreProtestor();
+
 	//initialize stats
 	m_stats.init();
 
@@ -34,6 +39,8 @@ int StudentWorld::move() {
 
 	//Give player a chance to do something
 	m_iceman->doSomething();
+
+	m_Protestor->doSomething();
 
 	// Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
 	return GWSTATUS_CONTINUE_GAME;
@@ -57,6 +64,9 @@ void StudentWorld::removeIce() noexcept {
 			m_oilField.removeIce(i, j);
 		}
 	}
+}
+bool StudentWorld::getIce(int x, int y) const noexcept {
+	return m_oilField.getIce(x, y);
 }
 
 //GameStats Implementation
@@ -94,6 +104,10 @@ void StudentWorld::OilField::cleanUp() noexcept {
 }
 std::array<std::array<Ice*, 64>, 64> StudentWorld::OilField::getField() {
 	return self;
+}
+bool StudentWorld::OilField::getIce(int x, int y) const noexcept {
+	if (x >= 0 && x <= 64 && y >= 0 && y <= 64 && self[x][y] == nullptr) return true;
+	return false;
 }
 void StudentWorld::OilField::removeIce(int x, int y) noexcept {
     if (x >= 0 && x <= 64) {

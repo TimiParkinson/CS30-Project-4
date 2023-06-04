@@ -47,6 +47,7 @@ private:
 
         void cleanUp() noexcept;
 		std::array<std::array<Ice*, 64>, 64> getField();
+		bool getIce(int x, int y) const noexcept;
         void removeIce(int x, int y) noexcept;
 		void init();
 	};
@@ -79,6 +80,7 @@ public:
 	virtual int move() override;
 	virtual void cleanUp() noexcept override;
 	void removeIce() noexcept;
+	bool getIce(int x, int y) const noexcept;
 
 	OilField m_oilField;
 };

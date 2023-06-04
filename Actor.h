@@ -7,33 +7,56 @@ class StudentWorld;
 
 class Actor : public GraphObject {
 public:
-	Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) 
+	Actor(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth) 
 		: GraphObject(imageID, startX, startY, dir, size, depth) {}
 	virtual ~Actor() {}
-	
 	virtual void doSomething() = 0;
-
 private:
 };
 
 #pragma region Entities
 class Entity : public Actor {
 public:
-	Entity(int imageID, int startX, int startY): Actor(imageID, startX, startY) {}
+	Entity(int imageID, int startX, int startY, Direction dir, StudentWorld* sp, int health) : Actor(imageID, startX, startY, dir, 1.0, 0), health(health), studentWorldPtr(sp) { setVisible(true); }
 	virtual ~Entity() {}
-	virtual void doSomething() = 0;							   
+	StudentWorld* getWorld() const noexcept;
+	virtual void doSomething() = 0;
+private:
+	unsigned int health;
+	StudentWorld* studentWorldPtr;
 };
 
 class Iceman : public Entity {									
 public:
-	Iceman(StudentWorld* sp = nullptr): Entity(IID_PLAYER, 30, 60), m_studentWorldPointer(sp) { setVisible(true); }
+	Iceman(StudentWorld* sp = nullptr) : Entity(IID_PLAYER, 30, 60, right, sp, 10) {}
 	virtual ~Iceman() {}
-
-	StudentWorld* getWorld() const noexcept;
 	void doSomething();
-
 private:
-	StudentWorld* m_studentWorldPointer;
+	
+};
+
+class Protestor : public Entity {
+public:
+	Protestor(StudentWorld* sp = nullptr, Iceman* im = nullptr) : Entity(IID_PROTESTER, 60, 60, left, sp, 5), iceman(im) {}
+	Protestor(StudentWorld* sp, Iceman* im, const int imageID, unsigned int health) : Entity(imageID, 60, 60, left, sp, health), iceman(im) {}
+	virtual ~Protestor() {}
+	virtual void doSomething();
+	virtual void makeMovement();
+private:
+	Iceman* iceman;
+	bool hasSeen = false;
+
+	unsigned int waitTime = 0;
+	bool isLeaving = false;
+	unsigned int shoutCooldown = 0;
+};
+
+class HardcoreProtestor : public Protestor {
+public:
+	HardcoreProtestor(StudentWorld* sp = nullptr, Iceman* im = nullptr) : Protestor(sp, im, IID_HARD_CORE_PROTESTER, 20) {}
+	virtual ~HardcoreProtestor() {};
+	void doSomething();
+private:
 };
 #pragma endregion Entities
 
@@ -75,11 +98,5 @@ public:
 	void doSomething() {}
 };
 #pragma endregion GameObjects
-
-
-
-
-
-// Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
 
 #endif // ACTOR_H_

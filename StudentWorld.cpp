@@ -194,16 +194,19 @@ void StudentWorld::OilField::init() {
 #pragma region Stage
 StudentWorld::Stage::~Stage() {
 	for (auto i : self) {
-
-        delete i;
-		i = nullptr;
+		if (i != nullptr) {
+			delete i;
+			i = nullptr;
+		}
 	}
 }
 
 void StudentWorld::Stage::cleanUp() noexcept {
 	for (auto i : self) {
-		delete i;
-		i = nullptr;
+		if (i != nullptr) {
+			delete i;
+			i = nullptr;
+		}
 	}
 }
 template <typename T>

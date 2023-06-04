@@ -148,7 +148,7 @@ public:
         setVisible(true); // Remove after testing, unintended behavior
     }
     virtual ~OilBarrel() {}
-    virtual void doSomething() {}
+    virtual void doSomething() override;
 };
 
 class GoldNugget : public Interactable {

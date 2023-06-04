@@ -195,3 +195,13 @@ void Boulder::Falling::doSomething() {
 #pragma endregion Falling
 #pragma endregion State
 #pragma endregion Boulder
+
+#pragma region Oil Barrel
+void OilBarrel::doSomething() {
+	return; 
+	// FIX ME
+	//not sure how to access setVisible()
+	//if u have any suggestions pls comment it 
+}
+
+#pragma endregion Oil Barrel

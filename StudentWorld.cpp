@@ -212,6 +212,7 @@ T* StudentWorld::Stage::spawnActor() {
 	self.insert(newActor);
 	return newActor;
 }
+
 template <>
 Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
 	static Boulder* newBoulder = nullptr;
@@ -227,12 +228,19 @@ Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
 	return newBoulder;
 }
 
-//OilBarrel* StudentWorld::Stage::spawnActor<OilBarrel>() {
-//	static OilBarrel* newOilBarrel = nullptr;
-//	pair<int, int> randomPosition = getRandomPosition();
-//
-//	if()
-//}
+template <>
+OilBarrel* StudentWorld::Stage::spawnActor<OilBarrel>() {
+	static OilBarrel* newOilBarrel = nullptr;
+	pair<int, int> randomPosition = getRandomPosition();
+
+	newOilBarrel = new OilBarrel(randomPosition.first, randomPosition.second);
+	self.insert(newOilBarrel);
+	return newOilBarrel;
+
+	//FIX ME
+	//not sure how to seperate barrels by 6 blocks
+	
+}
 
 
 void StudentWorld::Stage::removeActor(Actor* actor) noexcept {
@@ -242,6 +250,10 @@ void StudentWorld::Stage::init() {
 
 	for (int i = 0; i < m_studentWorldPointer->m_stats.getBoulders(); i++) {
 		spawnActor<Boulder>();
+	}
+	
+	for (int spawnOil = 0; spawnOil < m_studentWorldPointer->m_stats.getBarrels(); spawnOil++) {
+		spawnActor<OilBarrel>();
 	}
 }
 /*

@@ -223,7 +223,7 @@ Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
 	return newBoulder;
 }
 
-//inline OilBarrel* StudentWorld::Stage::spawnActor<OilBarrel>() {
+//OilBarrel* StudentWorld::Stage::spawnActor<OilBarrel>() {
 //	static OilBarrel* newOilBarrel = nullptr;
 //	pair<int, int> randomPosition = getRandomPosition();
 //

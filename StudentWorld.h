@@ -149,10 +149,10 @@ class StudentWorld : public GameWorld {
         std::unordered_set<Actor*> self;
         StudentWorld* m_studentWorldPointer;
         template <typename T>
-        inline T* spawnActor();
+        T* spawnActor();
         template <>
-        inline Boulder* spawnActor<Boulder>();
-        //inline OilBarrel* spawnActor<OilBarrel>();
+        Boulder* spawnActor<Boulder>();
+        OilBarrel* spawnActor<OilBarrel>();
         void removeActor(Actor* actor) noexcept;
      public:
         Stage(StudentWorld* swp) : m_studentWorldPointer(swp) {

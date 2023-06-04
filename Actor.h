@@ -130,6 +130,7 @@ class Boulder : public Terrain {
     virtual void doSomething() override;
 };
 #pragma endregion Terrain
+
 #pragma region Interactable
 class Interactable : public Object {
  public:

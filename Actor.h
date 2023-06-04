@@ -14,61 +14,17 @@ class Actor : public GraphObject {
     virtual void doSomething() = 0;
 };
 
-#pragma region Entities
-class Entity : public Actor {
- public:
-	Entity(int imageID, int startX, int startY, Direction dir, StudentWorld* sp, int health) : Actor(imageID, startX, startY, dir, 1.0, 0), health(health), m_studentWorldPointer(sp) { setVisible(true); }
-	virtual ~Entity() {}
-	StudentWorld* getWorld() const noexcept;
-	virtual void doSomething() = 0;
-private:
-	unsigned int health;
-	StudentWorld* m_studentWorldPointer;
-};
-
-class Iceman : public Entity {
- public:
-	Iceman(StudentWorld* sp = nullptr) : Entity(IID_PLAYER, 30, 60, right, sp, 10) {}
-	virtual ~Iceman() {}
-	void doSomething();
- private:
-};
-
-class Protestor : public Entity {
- public:
-	Protestor(StudentWorld* sp = nullptr, Iceman* im = nullptr) : Entity(IID_PROTESTER, 60, 60, left, sp, 5), iceman(im) {}
-	Protestor(StudentWorld* sp, Iceman* im, const int imageID, unsigned int health) : Entity(imageID, 60, 60, left, sp, health), iceman(im) {}
-	virtual ~Protestor() {}
-	virtual void doSomething();
-	virtual void makeMovement();
- private:
-	Iceman* iceman;
-	bool hasSeen = false;
-	unsigned int waitTime = 0;
-	bool isLeaving = false;
-	unsigned int shoutCooldown = 0;
-};
-
-class HardcoreProtestor : public Protestor {
- public:
-	HardcoreProtestor(StudentWorld* sp = nullptr, Iceman* im = nullptr) : Protestor(sp, im, IID_HARD_CORE_PROTESTER, 20) {}
-	virtual ~HardcoreProtestor() {};
-	void doSomething();
- private:
-};
-#pragma endregion Entities
-
 #pragma region Objects
 class Object : public Actor {
- public:
+public:
     Object(int imageID, int startX = 0, int startY = 0, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Actor(imageID, startX, startY, dir, size, depth) {}
-    virtual ~Object(){}
+    virtual ~Object() {}
 
     virtual void doSomething() = 0;
 };
 #pragma region Terrain
 class Terrain : public Object {
- public:
+public:
     Terrain(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Object(imageID, startX, startY, dir, size, depth) { setVisible(true); }
     Terrain(int imageID) : Object(imageID) {}
     virtual ~Terrain() {}
@@ -77,16 +33,16 @@ class Terrain : public Object {
 };
 
 class Ice : public Terrain {
- public:
+public:
     Ice(int startX, int startY, Direction dir = right, double size = .25, unsigned int depth = 3) : Terrain(IID_ICE, startX, startY, dir, size, depth) {}
     virtual ~Ice() {}
     virtual void doSomething() override {}
 };
 
 class Boulder : public Terrain {
- private:
-    #pragma region State
-    class State {
+private:
+#pragma region State
+     class State {
      private:
          Boulder* m_boulderPointer;
      public:
@@ -96,32 +52,32 @@ class Boulder : public Terrain {
         virtual ~State() {}
     };
     class Idle : public State {
-     private:
+    private:
         Boulder* m_boulderPointer;
-     public:
+    public:
         Idle(Boulder* boulder) : m_boulderPointer(boulder) {}
         virtual void doSomething() override;
         virtual ~Idle() {}
     };
-    class Waiting: public State {
-     private:
+    class Waiting : public State {
+    private:
         Boulder* m_boulderPointer;
-     public:
+    public:
         Waiting(Boulder* boulder) : m_boulderPointer(boulder) {}
         virtual void doSomething() override;
         virtual ~Waiting() {}
     };
     class Falling : public State {
-     private:
+    private:
         Boulder* m_boulderPointer;
-     public:
+    public:
         Falling(Boulder* boulder) : m_boulderPointer(boulder) {}
         virtual void doSomething() override;
         virtual ~Falling() {}
     };
-    #pragma endregion State
+#pragma endregion State
     State* m_state;
- public:
+public:
     Boulder(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 1) : Terrain(IID_BOULDER, startX, startY, dir, size, depth), m_state(new Idle(this)) {}
     virtual ~Boulder();
 
@@ -132,7 +88,7 @@ class Boulder : public Terrain {
 
 #pragma region Interactable
 class Interactable : public Object {
- public:
+public:
     Interactable(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) :
         Object(imageID, startX, startY, dir, size, depth) {}
     Interactable(int imageID) : Object(imageID) {}
@@ -183,4 +139,65 @@ public:
 };
 #pragma endregion Interactable
 #pragma endregion Objects
+
+#pragma region Entities
+class Entity : public Actor {
+ public:
+	Entity(int imageID, int startX, int startY, Direction dir, StudentWorld* sp, int health) : Actor(imageID, startX, startY, dir, 1.0, 0), health(health), m_studentWorldPointer(sp) { setVisible(true); }
+	virtual ~Entity() {}
+	StudentWorld* getWorld() const noexcept;
+	virtual void doSomething() = 0;
+private:
+	unsigned int health;
+	StudentWorld* m_studentWorldPointer;
+};
+
+class Squirt : public Interactable {
+public:
+    Squirt(int startX, int startY, Direction dir = none, double size = 1.0, unsigned int depth = 2) :
+        Interactable(IID_WATER_SPURT, startX, startY, dir, size, depth) {
+        setVisible(false);
+    }
+    virtual ~Squirt() {}
+    void doSomething() {}
+    void doSomething(Direction dir, StudentWorld* wrld);
+    bool isAlive();
+private:
+    unsigned int remaining = 4;
+    unsigned int cooldown = 10;
+};
+
+class Iceman : public Entity {
+ public:
+	Iceman(StudentWorld* sp = nullptr) : Entity(IID_PLAYER, 30, 60, right, sp, 10) {}
+	virtual ~Iceman() {}
+    void doSomething() {}
+	void doSomething(Squirt* sq);
+ private:
+};
+
+class Protestor : public Entity {
+ public:
+	Protestor(StudentWorld* sp = nullptr, Iceman* im = nullptr) : Entity(IID_PROTESTER, 60, 60, left, sp, 5), iceman(im) {}
+	Protestor(StudentWorld* sp, Iceman* im, const int imageID, unsigned int health) : Entity(imageID, 60, 60, left, sp, health), iceman(im) {}
+	virtual ~Protestor() {}
+	virtual void doSomething();
+	virtual void makeMovement();
+ private:
+	Iceman* iceman;
+	bool hasSeen = false;
+
+	unsigned int waitTime = 0;
+	bool isLeaving = false;
+	unsigned int shoutCooldown = 0;
+};
+
+class HardcoreProtestor : public Protestor {
+ public:
+	HardcoreProtestor(StudentWorld* sp = nullptr, Iceman* im = nullptr) : Protestor(sp, im, IID_HARD_CORE_PROTESTER, 20) {}
+	virtual ~HardcoreProtestor() {};
+	void doSomething();
+ private:
+};
+#pragma endregion Entities
 #endif // ACTOR_H_

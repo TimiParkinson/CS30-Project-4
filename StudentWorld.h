@@ -16,6 +16,7 @@
 
 class Actor;
 class Iceman;
+class Squirt;
 class Ice;
 class Boulder;
 class OilBarrel;
@@ -173,7 +174,7 @@ class StudentWorld : public GameWorld {
     OilField m_oilField;
     Stage m_stage;
     Iceman* m_iceman;
-
+    Squirt* m_squirt;
 public:
 	StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceman(nullptr), m_stats(this), m_stage(this) {}
 	virtual ~StudentWorld() override;
@@ -182,6 +183,7 @@ public:
 	virtual void cleanUp() noexcept override;
 	void removeIce() noexcept;
 	bool isIce(int x, int y) const noexcept;
+    void createSquirt(int x, int y) noexcept;
 };
 
 #endif // STUDENTWORLD_H_

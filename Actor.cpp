@@ -6,9 +6,12 @@ StudentWorld* Entity::getWorld() const noexcept {
 }
 
 #pragma region Iceman
-void Iceman::doSomething() {
-
-	constexpr int boundIceMan = 60;
+void Iceman::doSomething(Squirt* sq) {
+	  if (sq != nullptr) {
+		    sq->doSomething(getDirection(), getWorld());
+	  }
+  
+	  constexpr int boundIceMan = 60;
 
     int ch;
     if (getWorld()->getKey(ch)) {
@@ -45,9 +48,9 @@ void Iceman::doSomething() {
                 setDirection(down);
                 break;
             }
-        //case KEY_PRESS_SPACE:
-        //    // add a squirt in front of the player
-        //    break;
+        case KEY_PRESS_SPACE:
+			getWorld()->createSquirt(getX(), getY());
+			break;
         }
         getWorld()->removeIce();
     }
@@ -206,3 +209,53 @@ void Boulder::Falling::doSomething() {
 #pragma endregion Falling
 #pragma endregion State
 #pragma endregion Boulder
+
+void Squirt::doSomething(Direction dir, StudentWorld* wrld) {
+	if (cooldown == 0) {
+		if (getDirection() == none) {
+			setDirection(dir);
+		}
+		if (isVisible() == false) {
+			setVisible(true);
+		}
+		int x = getX();
+		int y = getY();
+		if (getDirection() == up) {
+			if (y < 60-1 && !wrld->isIce(x, y + 4) && !wrld->isIce(x + 1, y + 4) && !wrld->isIce(x + 2, y + 4) && !wrld->isIce(x + 3, y + 4)) {
+				moveTo(x, y + 2);
+			} else {
+				remaining = 0;
+				return;
+			}
+		} else if (getDirection() == right) {
+			if (x < 60-1 && !wrld->isIce(x + 4, y) && !wrld->isIce(x + 4, y + 1) && !wrld->isIce(x + 4, y + 2) && !wrld->isIce(x + 4, y + 3)) {
+				moveTo(x + 2, y);
+			} else {
+				remaining = 0;
+				return;
+			}
+		} else if (getDirection() == down) {
+			if (y > 0+1 && !wrld->isIce(x, y - 1) && !wrld->isIce(x + 1, y - 1) && !wrld->isIce(x + 2, y - 1) && !wrld->isIce(x + 3, y - 1)) {
+				moveTo(x, y - 2);
+			} else {
+				remaining = 0;
+				return;
+			}
+		} else {
+			if (x > 0+1 && !wrld->isIce(x - 1, y) && !wrld->isIce(x - 1, y + 1) && !wrld->isIce(x - 1, y + 2) && !wrld->isIce(x - 1, y + 3)) {
+				moveTo(x - 2, y);
+			} else {
+				remaining = 0;
+				return;
+			}
+		}
+		--remaining;
+		cooldown = 10;
+	} else {
+		--cooldown;
+	}
+}
+
+bool Squirt::isAlive() {
+	return (remaining != 0);
+}

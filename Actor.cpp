@@ -66,10 +66,10 @@ void Protestor::makeMovement() {
 	unsigned int d = 0;
 
 	// Get Movement Possibilities
-	if (y < 60 && getWorld()->getIce(x, y + 4) && getWorld()->getIce(x + 1, y + 4) && getWorld()->getIce(x + 2, y + 4) && getWorld()->getIce(x + 3, y + 4)) ++u;
-	if (x < 60 && getWorld()->getIce(x + 4, y) && getWorld()->getIce(x + 4, y + 1) && getWorld()->getIce(x + 4, y + 2) && getWorld()->getIce(x + 4, y + 3)) ++r;
-	if (x > 0 && getWorld()->getIce(x - 1, y) && getWorld()->getIce(x - 1, y + 1) && getWorld()->getIce(x - 1, y + 2) && getWorld()->getIce(x - 1, y + 3)) ++l;
-	if (y > 0 && getWorld()->getIce(x, y - 1) && getWorld()->getIce(x + 1, y - 1) && getWorld()->getIce(x + 2, y - 1) && getWorld()->getIce(x + 3, y - 1)) ++d;
+	if (y < 60 && !getWorld()->isIce(x, y + 4) && !getWorld()->isIce(x + 1, y + 4) && !getWorld()->isIce(x + 2, y + 4) && !getWorld()->isIce(x + 3, y + 4)) ++u;
+	if (x < 60 && !getWorld()->isIce(x + 4, y) && !getWorld()->isIce(x + 4, y + 1) && !getWorld()->isIce(x + 4, y + 2) && !getWorld()->isIce(x + 4, y + 3)) ++r;
+	if (x > 0 && !getWorld()->isIce(x - 1, y) && !getWorld()->isIce(x - 1, y + 1) && !getWorld()->isIce(x - 1, y + 2) && !getWorld()->isIce(x - 1, y + 3)) ++l;
+	if (y > 0 && !getWorld()->isIce(x, y - 1) && !getWorld()->isIce(x + 1, y - 1) && !getWorld()->isIce(x + 2, y - 1) && !getWorld()->isIce(x + 3, y - 1)) ++d;
 
 	// Get sightlines (FIX: Check for blocks in between)
 	if (iceman->getX() == x) {

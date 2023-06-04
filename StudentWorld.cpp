@@ -26,8 +26,7 @@ std::pair<int, int> getRandomPosition() {
 
 #pragma region StudentWorld
 StudentWorld::~StudentWorld() {
-	delete m_iceman;
-	m_iceman = nullptr;
+	cleanUp();
 }
 
 int StudentWorld::init() {
@@ -95,8 +94,8 @@ void StudentWorld::removeIce() noexcept {
 	}
 }
 
-bool StudentWorld::getIce(int x, int y) const noexcept {
-	return m_oilField.getIce(x, y);
+bool StudentWorld::isIce(int x, int y) const noexcept {
+	return m_oilField.isIce(x, y);
 }
 
 #pragma endregion StudentWorld
@@ -157,17 +156,6 @@ void StudentWorld::OilField::cleanUp() noexcept {
 		}
 	}
 }
-
-bool StudentWorld::OilField::getIce(int x, int y) const noexcept {
-	if (x >= 0 && x <= 64 && y >= 0 && y <= 64 && self[x][y] == nullptr) return true;
-	return false;
-}
-
-/*
- std::array<std::array<Ice*, 64>, 64> StudentWorld::OilField::getField() {
-	 return self;
- }
- */
 
 void StudentWorld::OilField::removeIce(int x, int y) noexcept {
 	if ((x >= 0 && x <= ICE_WIDTH - 1) && (y >= 0 && y <= ICE_HEIGHT - 1)) {

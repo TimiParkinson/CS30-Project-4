@@ -208,18 +208,30 @@ void Squirt::doSomething(Direction dir) {
 		if (getDirection() == up) {
 			if (getY() < 60-1) {
 				moveTo(getX(), getY() + 2);
+			} else {
+				remaining = 0;
+				return;
 			}
 		} else if (getDirection() == right) {
 			if (getX() < 60-1) {
 				moveTo(getX() + 2, getY());
+			} else {
+				remaining = 0;
+				return;
 			}
 		} else if (getDirection() == down) {
 			if (getY() > 0+1) {
 				moveTo(getX(), getY() - 2);
+			} else {
+				remaining = 0;
+				return;
 			}
 		} else {
 			if (getX() > 0+1) {
 				moveTo(getX() - 2, getY());
+			} else {
+				remaining = 0;
+				return;
 			}
 		}
 		--remaining;

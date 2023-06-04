@@ -42,11 +42,11 @@ public:
 class Boulder : public Terrain {
 private:
 #pragma region State
-    class State {
-    private:
-        Boulder* m_boulderPointer;
-    public:
-        State() {}
+     class State {
+     private:
+         Boulder* m_boulderPointer;
+     public:
+        State() : m_boulderPointer(nullptr) {}
         State(Boulder* boulder) : m_boulderPointer(boulder) {}
         virtual void doSomething() = 0;
         virtual ~State() {}

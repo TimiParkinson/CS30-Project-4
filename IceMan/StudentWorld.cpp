@@ -2,8 +2,6 @@
 #include "Actor.h"
 using namespace std;
 
-Protestor* m_Protestor;
-
 GameWorld* createStudentWorld(string assetDir) {
 	return new StudentWorld(assetDir);
 }
@@ -26,7 +24,8 @@ std::pair<int, int> getRandomPosition() {
 
 #pragma region StudentWorld
 StudentWorld::~StudentWorld() {
-	  cleanUp();
+    delete m_iceman;
+    m_iceman = nullptr;
 }
 
 int StudentWorld::init() {
@@ -42,9 +41,6 @@ int StudentWorld::init() {
 	//allocate and insert iceman
 	m_iceman = new Iceman(this);
 
-	m_Protestor = new Protestor(this, m_iceman);
-	//HardcoreProtestor* m_HardcoreProtestor = new HardcoreProtestor();
-
 	return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -57,8 +53,6 @@ int StudentWorld::move() {
 
 	//Give player a chance to do something
 	m_iceman->doSomething();
-
-	m_Protestor->doSomething();
 
 	// Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
 	return GWSTATUS_CONTINUE_GAME;
@@ -93,11 +87,6 @@ void StudentWorld::removeIce() noexcept {
 		playSound(SOUND_DIG);
 	}
 }
-
-bool StudentWorld::isIce(int x, int y) const noexcept {
-	return m_oilField.isIce(x, y);
-}
-
 #pragma endregion StudentWorld
 
 #pragma region GameStats
@@ -142,29 +131,33 @@ int StudentWorld::GameStats::getBoulders() const noexcept {
 
 #pragma region OilField
 StudentWorld::OilField::~OilField() {
-	for (auto& i : self) {
-		for (auto& j : i)
-			delete j;
-	}
+    for (auto& i : self) {
+        for (auto& j : i)
+            delete j;
+    }
 }
 
 void StudentWorld::OilField::cleanUp() noexcept {
-	for (auto& i : self) {
-		for (auto& j : i) {
-			delete j;
-			j = nullptr;
-		}
-	}
+    for (auto& i : self) {
+        for (auto& j : i) {
+            delete j;
+            j = nullptr;
+        }
+    }
 }
-
+/*
+ std::array<std::array<Ice*, 64>, 64> StudentWorld::OilField::getField() {
+     return self;
+ }
+ */
 void StudentWorld::OilField::removeIce(int x, int y) noexcept {
-	if ((x >= 0 && x <= ICE_WIDTH - 1) && (y >= 0 && y <= ICE_HEIGHT - 1)) {
-		if (self[x][y] != nullptr) {
-			self[x][y]->setVisible(false);
-			delete self[x][y];
-			self[x][y] = nullptr;
-		}
-	}
+    if ((x >= 0 && x <= ICE_WIDTH - 1) && (y >= 0 && y <= ICE_HEIGHT - 1))  {
+        if (self[x][y] != nullptr) {
+            self[x][y]->setVisible(false);
+            delete self[x][y];
+            self[x][y] = nullptr;
+        }
+    }
 }
 
 bool StudentWorld::OilField::isIce(int x, int y) const noexcept {
@@ -177,8 +170,8 @@ bool StudentWorld::OilField::isIce(int x, int y) const noexcept {
 }
 
 void StudentWorld::OilField::init() {
-	for (int x = 0; x < ICE_WIDTH; x++) {
-		for (int y = 0; y < ICE_HEIGHT; y++) {
+   for (int x = 0; x < ICE_WIDTH; x++) {
+		for (int y = 0; y < ICE_HEIGHT; y++){
 			if ((x >= 30 && x <= 33) && (y >= 4 && y <= ICE_HEIGHT - 1)) {
 				continue;
 			}
@@ -190,27 +183,27 @@ void StudentWorld::OilField::init() {
 
 #pragma region Stage
 StudentWorld::Stage::~Stage() {
-	for (auto i : self) {
-		delete i;
-		i = nullptr;
-	}
+    for (auto i : self) {
+        delete i;
+        i = nullptr;
+    }
 }
 
 void StudentWorld::Stage::cleanUp() noexcept {
-	for (auto i : self) {
-		delete i;
-		i = nullptr;
-	}
+    for (auto i : self) {
+        delete i;
+        i = nullptr;
+    }
 }
 template <typename T>
-T* StudentWorld::Stage::spawnActor() {
+inline T* StudentWorld::Stage::spawnActor() {
 	T* newActor = new T();
 	self.insert(newActor);
 	return newActor;
 }
 template <>
-Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
-	static Boulder* newBoulder = nullptr;
+inline Boulder*  StudentWorld::Stage::spawnActor<Boulder>() {
+    static Boulder* newBoulder = nullptr;
 	pair<int, int> randomPosition = getRandomPosition();
 
 	if (!m_boulderBlackList.isListed(randomPosition)) {
@@ -219,20 +212,12 @@ Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
 		self.insert(newBoulder);
 		return newBoulder;
 	}
+
 	spawnActor<Boulder>();
-	return newBoulder;
+    return newBoulder;
 }
-
-//inline OilBarrel* StudentWorld::Stage::spawnActor<OilBarrel>() {
-//	static OilBarrel* newOilBarrel = nullptr;
-//	pair<int, int> randomPosition = getRandomPosition();
-//
-//	if()
-//}
-
-
 void StudentWorld::Stage::removeActor(Actor* actor) noexcept {
-	self.erase(actor);
+    self.erase(actor);
 }
 void StudentWorld::Stage::init() {
 
@@ -242,23 +227,23 @@ void StudentWorld::Stage::init() {
 }
 /*
  void StudentWorld::Stage::init(OilField myField) {
-	 auto m_oilField = myField.getField();
-	 const int numBoulders = 6;
-	 std::array<Boulder*, numBoulders> m_boulderField;
-	 Ice* testIce = new Ice(0, 0);
-	 int temp = numBoulders;
-	 while (temp > 0) {
-		 int rand_x = rand() % 60;
-		 int rand_y = rand() % 36 + 20;
-		 m_oilField[rand_x][rand_y] = testIce;
-		 m_oilField[rand_x+1][rand_y] = testIce;
-		 m_oilField[rand_x+2][rand_y] = testIce;
-		 m_oilField[rand_x+3][rand_y] = testIce;
-		 m_boulderField[numBoulders-temp] = new Boulder(rand_x, rand_y);
-		 temp--;
-	 }
+     auto m_oilField = myField.getField();
+     const int numBoulders = 6;
+     std::array<Boulder*, numBoulders> m_boulderField;
+     Ice* testIce = new Ice(0, 0);
+     int temp = numBoulders;
+     while (temp > 0) {
+         int rand_x = rand() % 60;
+         int rand_y = rand() % 36 + 20;
+         m_oilField[rand_x][rand_y] = testIce;
+         m_oilField[rand_x+1][rand_y] = testIce;
+         m_oilField[rand_x+2][rand_y] = testIce;
+         m_oilField[rand_x+3][rand_y] = testIce;
+         m_boulderField[numBoulders-temp] = new Boulder(rand_x, rand_y);
+         temp--;
+     }
 
-	 delete testIce;
+     delete testIce;
  }
  */
 void StudentWorld::Stage::move() {

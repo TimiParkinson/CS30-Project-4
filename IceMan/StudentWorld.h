@@ -37,9 +37,9 @@ class StudentWorld : public GameWorld {
         }
         virtual ~BlackList() {}
 
-        void init() {
+        void init () {
             for (int x = 0; x < ICE_WIDTH; x++) {
-                for (int y = 0; y < ICE_HEIGHT; y++) {
+                for (int y = 0; y < ICE_HEIGHT; y++){
                     if (((x >= 30 && x <= 33) && (y >= 4 && y <= ICE_HEIGHT - 1)) || y <= 59) {
                         m_positions[m_positions.size() - 1] = std::make_pair(x, y);
                         std::cout << "Blacklisted at " << x << ", " << y << std::endl;
@@ -52,11 +52,11 @@ class StudentWorld : public GameWorld {
                 m_positions[m_positions.size() - 1] = p;
             }
         }
-        bool isListed(std::pair<int, int> p) {
+        bool isListed (std::pair<int, int> p) {
             //return std::ranges::find(m_positions, p) != m_positions.end(); [[NO XCODE SUPPORT]]
             return std::find(m_positions.begin(), m_positions.end(), p) != m_positions.end();
         }
-        bool isListed(int x, int y) {
+        bool isListed (int x, int y) {
             //return std::ranges::find(m_positions, std::make_pair(x, y)) != m_positions.end(); [[NO XCODE SUPPORT]]
             return std::find(m_positions.begin(), m_positions.end(), std::make_pair(x, y)) != m_positions.end();
         }
@@ -151,7 +151,6 @@ class StudentWorld : public GameWorld {
         inline T* spawnActor();
         template <>
         inline Boulder* spawnActor<Boulder>();
-        //inline OilBarrel* spawnActor<OilBarrel>();
         void removeActor(Actor* actor) noexcept;
      public:
         Stage(StudentWorld* swp) : m_studentWorldPointer(swp) {
@@ -172,14 +171,17 @@ class StudentWorld : public GameWorld {
     Stage m_stage;
     Iceman* m_iceman;
 
-public:
-	  StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceman(nullptr), m_stats(this), m_stage(this) {}
-      virtual ~StudentWorld() override;
-	  virtual int init() override;
-	  virtual int move() override;
-	  virtual void cleanUp() noexcept override;
-	  void removeIce() noexcept;
-	  bool isIce(int x, int y) const noexcept;
+ public:
+    StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceman(nullptr), m_stats(this), m_stage(this) {}
+    virtual ~StudentWorld();
+
+    virtual int init() override;
+
+    virtual int move() override;
+
+    virtual void cleanUp() noexcept override ;
+
+    void removeIce() noexcept;
 };
 
 #endif // STUDENTWORLD_H_

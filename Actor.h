@@ -160,7 +160,7 @@ public:
     }
     virtual ~Squirt() {}
     void doSomething() {}
-    void doSomething(Direction dir);
+    void doSomething(Direction dir, StudentWorld* wrld);
     bool isAlive();
 private:
     unsigned int remaining = 4;

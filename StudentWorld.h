@@ -181,7 +181,7 @@ public:
 	virtual void cleanUp() noexcept override;
 	void removeIce() noexcept;
 	bool isIce(int x, int y) const noexcept;
-    void StudentWorld::createSquirt(int x, int y) noexcept;
+    void createSquirt(int x, int y) noexcept;
 };
 
 #endif // STUDENTWORLD_H_

@@ -7,6 +7,9 @@ StudentWorld* Entity::getWorld() const noexcept {
 
 #pragma region Iceman
 void Iceman::doSomething() {
+
+	constexpr int boundIceMan = 60;
+
     int ch;
     if (getWorld()->getKey(ch)) {
         switch (ch) {
@@ -19,7 +22,7 @@ void Iceman::doSomething() {
                 break;
             }
         case KEY_PRESS_RIGHT:
-            if (getDirection() == right && getX() < 64) {
+            if (getDirection() == right && getX() < boundIceMan) {
                 moveTo(getX() + 1, getY());
                 break;
             } else {
@@ -27,7 +30,7 @@ void Iceman::doSomething() {
                 break;
             }
         case KEY_PRESS_UP:
-            if (getDirection() == up && getY() < 64) {
+            if (getDirection() == up && getY() < boundIceMan) {
                 moveTo(getX(), getY() + 1);
                 break;
             } else {

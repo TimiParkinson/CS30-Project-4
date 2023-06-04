@@ -151,8 +151,9 @@ class StudentWorld : public GameWorld {
         template <typename T>
         T* spawnActor();
         template <>
-        Boulder* spawnActor();
-        OilBarrel* spawnActor();
+        Boulder* spawnActor<Boulder>();
+        template <>
+        OilBarrel* spawnActor<OilBarrel>();
         void removeActor(Actor* actor) noexcept;
      public:
         Stage(StudentWorld* swp) : m_studentWorldPointer(swp) {

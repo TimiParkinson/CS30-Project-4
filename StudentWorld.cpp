@@ -9,28 +9,31 @@ GameWorld* createStudentWorld(string assetDir) {
 }
 
 #pragma region Utilities
-std::mt19937 generatorX{ std::random_device{}() };
-std::uniform_int_distribution<> distributionX{ 0, ICE_WIDTH - 1 };
+std::mt19937 generatorX { std::random_device{}() };
+std::uniform_int_distribution<> distributionX { 0, ICE_WIDTH - 1 };
 auto get_randomX = std::bind(distributionX, generatorX);
 
-std::mt19937 generatorY{ std::random_device{}() };
-std::uniform_int_distribution<> distributionY{ 0, ICE_HEIGHT - 1 };
+std::mt19937 generatorY { std::random_device{}() };
+std::uniform_int_distribution<> distributionY { 0, ICE_HEIGHT - 1 };
 auto get_randomY = std::bind(distributionY, generatorY);
 
 std::pair<int, int> getRandomPosition() {
-	int x = get_randomX();
-	int y = get_randomY();
-	return std::make_pair(x, y);
+    int x = get_randomX();
+    int y = get_randomY();
+    return std::make_pair(x, y);
 }
 #pragma endregion Utilities
 
 #pragma region StudentWorld
 StudentWorld::~StudentWorld() {
-	delete m_iceman;
-	m_iceman = nullptr;
+    delete m_iceman;
+    m_iceman = nullptr;
 }
 
 int StudentWorld::init() {
+	//initialize stats
+	m_stats.init();
+
 	//initialize actors
 	m_stage.init();
 
@@ -42,9 +45,6 @@ int StudentWorld::init() {
 
 	m_Protestor = new Protestor(this, m_iceman);
 	//HardcoreProtestor* m_HardcoreProtestor = new HardcoreProtestor();
-
-	//initialize stats
-	m_stats.init();
 
 	return GWSTATUS_CONTINUE_GAME;
 }
@@ -66,9 +66,9 @@ int StudentWorld::move() {
 }
 
 void StudentWorld::cleanUp() noexcept {
-	delete m_iceman;
+    delete m_iceman;
 	m_iceman = nullptr;
-	m_oilField.cleanUp();
+    m_oilField.cleanUp();
 	m_stage.cleanUp();
 }
 
@@ -103,12 +103,12 @@ bool StudentWorld::getIce(int x, int y) const noexcept {
 
 #pragma region GameStats
 void StudentWorld::GameStats::init() noexcept {
-	m_boulderCount = min(m_levelCount / 2 + 2, 9);
-	m_goldCount = max(5 - m_levelCount / 2, 2);
-	m_barrelCount = min(2 + m_levelCount, 21);
+    m_boulderCount = min(m_levelCount / 2 + 2, 9);
+    m_goldCount = max(5 - m_levelCount / 2, 2);
+    m_barrelCount = min(2 + m_levelCount, 21);
 }
 string StudentWorld::GameStats::toString() const noexcept {
-	return "<game statistics>";
+    return "<game statistics>";
 }
 
 // Getters
@@ -215,13 +215,13 @@ void StudentWorld::Stage::cleanUp() noexcept {
 	}
 }
 template <typename T>
-inline T* StudentWorld::Stage::spawnActor() {
+T* StudentWorld::Stage::spawnActor() {
 	T* newActor = new T();
 	self.insert(newActor);
 	return newActor;
 }
 template <>
-inline Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
+Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
 	static Boulder* newBoulder = nullptr;
 	pair<int, int> randomPosition = getRandomPosition();
 

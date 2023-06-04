@@ -2,7 +2,7 @@
 #include "StudentWorld.h"
 
 StudentWorld* Entity::getWorld() const noexcept {
-	return studentWorldPtr;
+	return m_studentWorldPointer;
 }
 
 #pragma region Iceman
@@ -11,11 +11,10 @@ void Iceman::doSomething() {
     if (getWorld()->getKey(ch)) {
         switch (ch) {
         case KEY_PRESS_LEFT:
-            if (getDirection() == left && getX() > 0) {
+            if(getDirection() == left && getX() > 0) {
                 moveTo(getX() - 1, getY());
                 break;
-            }
-            else {
+            } else {
                 setDirection(left);
                 break;
             }
@@ -23,8 +22,7 @@ void Iceman::doSomething() {
             if (getDirection() == right && getX() < 64) {
                 moveTo(getX() + 1, getY());
                 break;
-            }
-            else {
+            } else {
                 setDirection(right);
                 break;
             }
@@ -32,8 +30,7 @@ void Iceman::doSomething() {
             if (getDirection() == up && getY() < 64) {
                 moveTo(getX(), getY() + 1);
                 break;
-            }
-            else {
+            } else {
                 setDirection(up);
                 break;
             }
@@ -41,14 +38,13 @@ void Iceman::doSomething() {
             if (getDirection() == down && getY() > 0) {
                 moveTo(getX(), getY() - 1);
                 break;
-            }
-            else {
+            } else {
                 setDirection(down);
                 break;
             }
-            //case KEY_PRESS_SPACE:
-            //    // add a squirt in front of the player
-            //    break;
+        //case KEY_PRESS_SPACE:
+        //    // add a squirt in front of the player
+        //    break;
         }
         getWorld()->removeIce();
     }

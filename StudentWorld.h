@@ -25,13 +25,13 @@ constexpr int ICE_HEIGHT = 60;
 std::pair<int, int> getRandomPosition();
 
 class StudentWorld : public GameWorld {
-private:
-#pragma region BlackList
+ private:
+    #pragma region BlackList
     template <typename T>
     class BlackList {
-    private:
-        std::array<std::pair<int, int>, ICE_WIDTH* ICE_HEIGHT> m_positions;
-    public:
+     private:
+        std::array<std::pair<int, int>, ICE_WIDTH * ICE_HEIGHT> m_positions;
+     public:
         BlackList() {
             init();
         }
@@ -64,10 +64,10 @@ private:
 
     template <>
     class BlackList<Boulder> : public BlackList<BlackList<Boulder>> {
-    private:
-        std::array<std::pair<int, int>, ICE_WIDTH* ICE_HEIGHT> m_positions;
+     private:
+        std::array<std::pair<int, int>, ICE_WIDTH * ICE_HEIGHT> m_positions;
         const int m_boulderPadding = 6;
-    public:
+     public:
         BlackList() {
             init();
         }
@@ -78,8 +78,7 @@ private:
                     p = std::make_pair(p.first + i, p.second + j);
                     if (isListed(p.first, p.second)) {
                         continue;
-                    }
-                    else {
+                    } else {
                         m_positions[m_positions.size() - 1] = p;
                     }
                 }
@@ -87,12 +86,12 @@ private:
         }
     };
 
-#pragma endregion BlackList
+    #pragma endregion BlackList
 
-#pragma region GameStats
+    #pragma region GameStats
     class GameStats {
-    private:
-        StudentWorld* m_studentWorldPointer;
+     private:
+         StudentWorld* m_studentWorldPointer;
 
         int m_levelCount;
         int m_lifeCount;
@@ -103,7 +102,7 @@ private:
         int m_barrelCount;
         int m_sonarCount;
         int m_boulderCount;
-    public:
+     public:
         GameStats(StudentWorld* swp) : m_studentWorldPointer(swp), m_levelCount(swp->getLevel()), m_lifeCount(swp->getLives()), m_scoreCount(swp->getScore()) {}
         void init() noexcept;
         std::string toString() const noexcept;
@@ -119,14 +118,14 @@ private:
         int getSonar() const noexcept;
         int getBoulders() const noexcept;
     };
-#pragma endregion GameStats
+    #pragma endregion GameStats
 
-#pragma region OilField
+    #pragma region OilField
     class OilField {
-    private:
-        std::array<std::array<Ice*, ICE_HEIGHT>, ICE_WIDTH> self;
+     private:
+         std::array<std::array<Ice*, ICE_HEIGHT>, ICE_WIDTH> self;
         BlackList<Ice> m_iceBlackList;
-    public:
+     public:
         OilField() {
             for (auto& i : self) {
                 for (auto& j : i)
@@ -136,28 +135,29 @@ private:
         ~OilField();
 
         void cleanUp() noexcept;
-		    //std::array<std::array<Ice*, 64>, 64> getField();
-		    bool getIce(int x, int y) const noexcept;
+        //std::array<std::array<Ice*, 64>, 64> getField();
+        bool getIce(int x, int y) const noexcept;
 
         void removeIce(int x, int y) noexcept;
         bool isIce(int x, int y) const noexcept;
         void init();
     };
-#pragma endregion OilField
+    #pragma endregion OilField
 
-#pragma region Stage
+    #pragma region Stage
     class Stage {
-    private:
+     private:
         BlackList<Boulder> m_boulderBlackList;
         std::unordered_set<Actor*> self;
         StudentWorld* m_studentWorldPointer;
         template <typename T>
-        inline T* spawnActor();
+        T* spawnActor();
         template <>
-        inline Boulder* spawnActor<Boulder>();
-        inline OilBarrel* spawnActor<OilBarrel>();
+        Boulder* spawnActor<Boulder>();
+        template <>
+        OilBarrel* spawnActor<OilBarrel>();
         void removeActor(Actor* actor) noexcept;
-    public:
+     public:
         Stage(StudentWorld* swp) : m_studentWorldPointer(swp) {
             for (auto i : self) {
                 i = nullptr;
@@ -169,7 +169,7 @@ private:
         void init();
         void move();
     };
-#pragma endregion Stage
+    #pragma endregion Stage
 
     GameStats m_stats;
     OilField m_oilField;

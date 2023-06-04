@@ -74,10 +74,12 @@ void Protestor::makeMovement() {
 	if (iceman->getX() == x) {
 		if (u != 0 && iceman->getY() > y) { ++u; hasSeen = true; }
 		else if (d != 0) { ++d; hasSeen = true; }
-	} else if (iceman->getY() == y) {
+	}
+	else if (iceman->getY() == y) {
 		if (r != 0 && iceman->getX() > x) { ++r; hasSeen = true; }
 		else if (l != 0) { ++l; hasSeen = true; }
-	} else {
+	}
+	else {
 		if (hasSeen == true) {
 			if (u != 0 && getDirection() == up) ++u;
 			else if (r != 0 && getDirection() == right) ++r;
@@ -91,6 +93,15 @@ void Protestor::makeMovement() {
 	if (r != 0 && getDirection() != left) ++r;
 	if (l != 0 && getDirection() != right) ++l;
 	if (d != 0 && getDirection() != up) ++d;
+
+	// Encourage Turning
+	bool encourageTurning = (std::rand() % 7) % 3 == 0;
+	if (encourageTurning) {
+		if (u != 0 && (getDirection() == left || getDirection() == right)) ++u;
+		if (r != 0 && (getDirection() == down || getDirection() == up)) ++r;
+		if (l != 0 && (getDirection() == up || getDirection() == down)) ++l;
+		if (d != 0 && (getDirection() == right || getDirection() == left)) ++d;
+	}
 
 	Direction toGo;
 	int highest = 0;

@@ -44,7 +44,6 @@ class Protestor : public Entity {
  private:
 	Iceman* iceman;
 	bool hasSeen = false;
-
 	unsigned int waitTime = 0;
 	bool isLeaving = false;
 	unsigned int shoutCooldown = 0;
@@ -89,9 +88,9 @@ class Boulder : public Terrain {
     #pragma region State
     class State {
      private:
-        Boulder* m_boulderPointer;
+         Boulder* m_boulderPointer;
      public:
-        State() {}
+        State() : m_boulderPointer(nullptr) {}
         State(Boulder* boulder) : m_boulderPointer(boulder) {}
         virtual void doSomething() = 0;
         virtual ~State() {}

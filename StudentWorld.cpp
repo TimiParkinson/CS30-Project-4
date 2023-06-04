@@ -26,7 +26,10 @@ std::pair<int, int> getRandomPosition() {
 
 #pragma region StudentWorld
 StudentWorld::~StudentWorld() {
-	  cleanUp();
+	delete m_iceman;
+	m_iceman = nullptr;
+    m_oilField.cleanUp();
+	m_stage.cleanUp();
 }
 
 int StudentWorld::init() {
@@ -191,7 +194,8 @@ void StudentWorld::OilField::init() {
 #pragma region Stage
 StudentWorld::Stage::~Stage() {
 	for (auto i : self) {
-		delete i;
+
+        delete i;
 		i = nullptr;
 	}
 }

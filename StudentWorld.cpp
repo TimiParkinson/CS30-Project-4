@@ -2,6 +2,8 @@
 #include "Actor.h"
 using namespace std;
 
+Protestor* m_Protestor;
+
 GameWorld* createStudentWorld(string assetDir) {
 	return new StudentWorld(assetDir);
 }
@@ -29,9 +31,6 @@ StudentWorld::~StudentWorld() {
 }
 
 int StudentWorld::init() {
-	//initialize stats
-	m_stats.init();
-
 	//initialize actors
 	m_stage.init();
 
@@ -40,6 +39,12 @@ int StudentWorld::init() {
 
 	//allocate and insert iceman
 	m_iceman = new Iceman(this);
+
+	m_Protestor = new Protestor(this, m_iceman);
+	//HardcoreProtestor* m_HardcoreProtestor = new HardcoreProtestor();
+
+	//initialize stats
+	m_stats.init();
 
 	return GWSTATUS_CONTINUE_GAME;
 }
@@ -53,6 +58,8 @@ int StudentWorld::move() {
 
 	//Give player a chance to do something
 	m_iceman->doSomething();
+
+	m_Protestor->doSomething();
 
 	// Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
 	return GWSTATUS_CONTINUE_GAME;
@@ -87,6 +94,11 @@ void StudentWorld::removeIce() noexcept {
 		playSound(SOUND_DIG);
 	}
 }
+
+bool StudentWorld::getIce(int x, int y) const noexcept {
+	return m_oilField.getIce(x, y);
+}
+
 #pragma endregion StudentWorld
 
 #pragma region GameStats
@@ -145,11 +157,18 @@ void StudentWorld::OilField::cleanUp() noexcept {
 		}
 	}
 }
+
+bool StudentWorld::OilField::getIce(int x, int y) const noexcept {
+	if (x >= 0 && x <= 64 && y >= 0 && y <= 64 && self[x][y] == nullptr) return true;
+	return false;
+}
+
 /*
  std::array<std::array<Ice*, 64>, 64> StudentWorld::OilField::getField() {
 	 return self;
  }
  */
+
 void StudentWorld::OilField::removeIce(int x, int y) noexcept {
 	if ((x >= 0 && x <= ICE_WIDTH - 1) && (y >= 0 && y <= ICE_HEIGHT - 1)) {
 		if (self[x][y] != nullptr) {

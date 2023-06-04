@@ -136,6 +136,9 @@ private:
         ~OilField();
 
         void cleanUp() noexcept;
+		    //std::array<std::array<Ice*, 64>, 64> getField();
+		    bool getIce(int x, int y) const noexcept;
+
         void removeIce(int x, int y) noexcept;
         bool isIce(int x, int y) const noexcept;
         void init();
@@ -174,16 +177,13 @@ private:
     Iceman* m_iceman;
 
 public:
-    StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceman(nullptr), m_stats(this), m_stage(this) {}
-    virtual ~StudentWorld();
-
-    virtual int init() override;
-
-    virtual int move() override;
-
-    virtual void cleanUp() noexcept override;
-
-    void removeIce() noexcept;
+	  StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceman(nullptr), m_stats(this), m_stage(this) {}
+	  virtual ~StudentWorld() { cleanUp(); }
+	  virtual int init() override;
+	  virtual int move() override;
+	  virtual void cleanUp() noexcept override;
+	  void removeIce() noexcept;
+	  bool getIce(int x, int y) const noexcept;
 };
 
 #endif // STUDENTWORLD_H_

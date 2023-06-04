@@ -7,42 +7,55 @@ class StudentWorld;
 
 class Actor : public GraphObject {
 public:
-    Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0)
-        : GraphObject(imageID, startX, startY, dir, size, depth) {}
-    virtual ~Actor() {}
-
-    virtual void doSomething() = 0;
+	Actor(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth) 
+		: GraphObject(imageID, startX, startY, dir, size, depth) {}
+	virtual ~Actor() {}
+	virtual void doSomething() = 0;
+private:
 };
 
 #pragma region Entities
 class Entity : public Actor {
 public:
-    Entity(int imageID, int startX, int startY) : Actor(imageID, startX, startY) {}
-    virtual ~Entity() {}
-
-    virtual void doSomething() = 0;
+	Entity(int imageID, int startX, int startY, Direction dir, StudentWorld* sp, int health) : Actor(imageID, startX, startY, dir, 1.0, 0), health(health), studentWorldPtr(sp) { setVisible(true); }
+	virtual ~Entity() {}
+	StudentWorld* getWorld() const noexcept;
+	virtual void doSomething() = 0;
+private:
+	unsigned int health;
+	StudentWorld* studentWorldPtr;
 };
 
 class Iceman : public Entity {
-private:
-    StudentWorld* m_studentWorldPointer;
-    int m_health;
 public:
-    Iceman(StudentWorld* swp = nullptr) : Entity(IID_PLAYER, 30, 60), m_studentWorldPointer(swp) { setVisible(true); }
-    virtual ~Iceman() {}
-
-    StudentWorld* getWorld() const noexcept;
-    virtual void doSomething() override;
+	Iceman(StudentWorld* sp = nullptr) : Entity(IID_PLAYER, 30, 60, right, sp, 10) {}
+	virtual ~Iceman() {}
+	void doSomething();
+private:
 };
 
 class Protestor : public Entity {
-private:
-    StudentWorld* m_studentWorldPointer;
 public:
-    Protestor(StudentWorld* swp) : Entity(IID_PROTESTER, 60, 60), m_studentWorldPointer(swp) { setDirection(Direction::left); setVisible(true); }
-    virtual ~Protestor() {}
+	Protestor(StudentWorld* sp = nullptr, Iceman* im = nullptr) : Entity(IID_PROTESTER, 60, 60, left, sp, 5), iceman(im) {}
+	Protestor(StudentWorld* sp, Iceman* im, const int imageID, unsigned int health) : Entity(imageID, 60, 60, left, sp, health), iceman(im) {}
+	virtual ~Protestor() {}
+	virtual void doSomething();
+	virtual void makeMovement();
+private:
+	Iceman* iceman;
+	bool hasSeen = false;
 
-    virtual void doSomething() override;
+	unsigned int waitTime = 0;
+	bool isLeaving = false;
+	unsigned int shoutCooldown = 0;
+};
+
+class HardcoreProtestor : public Protestor {
+public:
+	HardcoreProtestor(StudentWorld* sp = nullptr, Iceman* im = nullptr) : Protestor(sp, im, IID_HARD_CORE_PROTESTER, 20) {}
+	virtual ~HardcoreProtestor() {};
+	void doSomething();
+private:
 };
 #pragma endregion Entities
 
@@ -166,8 +179,4 @@ public:
     virtual void doSomething() {}
 };
 #pragma endregion Objects
-
-
-// Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
-
 #endif // ACTOR_H_

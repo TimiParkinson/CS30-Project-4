@@ -44,6 +44,7 @@ int StudentWorld::init() {
 
 	//allocate and insert iceman
 	m_iceman = new Iceman(this);
+	m_squirt = nullptr;
 
 	m_Protestor = new Protestor(this, m_iceman);
 	//HardcoreProtestor* m_HardcoreProtestor = new HardcoreProtestor();
@@ -59,7 +60,11 @@ int StudentWorld::move() {
 	m_stage.move();
 
 	//Give player a chance to do something
-	m_iceman->doSomething();
+	m_iceman->doSomething(m_squirt);
+	if (m_squirt != nullptr && !m_squirt->isAlive()) {
+		delete m_squirt;
+		m_squirt = nullptr;
+	}
 
 	m_Protestor->doSomething();
 
@@ -98,17 +103,21 @@ void StudentWorld::removeIce() noexcept {
 }
 
 bool StudentWorld::isIce(int x, int y) const noexcept {
-	return m_oilField.isIce(x, y);
+    return m_oilField.isIce(x, y);
 }
 
 int StudentWorld::playerX() const {
-	return m_iceman->getX();
+    return m_iceman->getX();
 }
 
 int StudentWorld::playerY() const {
-	return m_iceman->getY();
+    return m_iceman->getY();
 }
 
+void StudentWorld::createSquirt(int x, int y) noexcept {
+    playSound(SOUND_PLAYER_SQUIRT);
+    m_squirt = new Squirt(x, y);
+}
 #pragma endregion StudentWorld
 
 #pragma region GameStats
@@ -202,16 +211,19 @@ void StudentWorld::OilField::init() {
 #pragma region Stage
 StudentWorld::Stage::~Stage() {
 	for (auto i : self) {
-
-        delete i;
-		i = nullptr;
+		if (i != nullptr) {
+			delete i;
+			i = nullptr;
+		}
 	}
 }
 
 void StudentWorld::Stage::cleanUp() noexcept {
 	for (auto i : self) {
-		delete i;
-		i = nullptr;
+		if (i != nullptr) {
+			delete i;
+			i = nullptr;
+		}
 	}
 }
 template <typename T>

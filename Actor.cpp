@@ -18,9 +18,12 @@ const int Actor::getDeathSound() const {
 }
 
 #pragma region Iceman
-void Iceman::doSomething() {
-
-	constexpr int boundIceMan = 60;
+void Iceman::doSomething(Squirt* sq) {
+	  if (sq != nullptr) {
+		    sq->doSomething(getDirection(), getWorld());
+	  }
+  
+	  constexpr int boundIceMan = 60;
 
     int ch;
     if (getWorld()->getKey(ch)) {
@@ -57,9 +60,9 @@ void Iceman::doSomething() {
                 setDirection(down);
                 break;
             }
-        //case KEY_PRESS_SPACE:
-        //    // add a squirt in front of the player
-        //    break;
+        case KEY_PRESS_SPACE:
+			getWorld()->createSquirt(getX(), getY());
+			break;
         }
         getWorld()->removeIce();
     }
@@ -86,10 +89,12 @@ void Protestor::makeMovement() {
 	if (iceman->getX() == x) {
 		if (u != 0 && iceman->getY() > y) { ++u; hasSeen = true; }
 		else if (d != 0) { ++d; hasSeen = true; }
-	} else if (iceman->getY() == y) {
+	}
+	else if (iceman->getY() == y) {
 		if (r != 0 && iceman->getX() > x) { ++r; hasSeen = true; }
 		else if (l != 0) { ++l; hasSeen = true; }
-	} else {
+	}
+	else {
 		if (hasSeen == true) {
 			if (u != 0 && getDirection() == up) ++u;
 			else if (r != 0 && getDirection() == right) ++r;
@@ -103,6 +108,15 @@ void Protestor::makeMovement() {
 	if (r != 0 && getDirection() != left) ++r;
 	if (l != 0 && getDirection() != right) ++l;
 	if (d != 0 && getDirection() != up) ++d;
+
+	// Encourage Turning
+	bool encourageTurning = (std::rand() % 7) % 3 == 0;
+	if (encourageTurning) {
+		if (u != 0 && (getDirection() == left || getDirection() == right)) ++u;
+		if (r != 0 && (getDirection() == down || getDirection() == up)) ++r;
+		if (l != 0 && (getDirection() == up || getDirection() == down)) ++l;
+		if (d != 0 && (getDirection() == right || getDirection() == left)) ++d;
+	}
 
 	Direction toGo;
 	int highest = 0;
@@ -211,7 +225,6 @@ void Boulder::Falling::doSomething() {
 #pragma endregion Falling
 #pragma endregion State
 #pragma endregion Boulder
-
 #pragma region Oil Barrel
 void OilBarrel::doSomething() {
 	if (!isAlive()) return;
@@ -233,3 +246,52 @@ double euclidianDistance(int x1, int y1, int x2, int y2) {
 }
 
 #pragma endregion Oil Barrel
+void Squirt::doSomething(Direction dir, StudentWorld* wrld) {
+	if (cooldown == 0) {
+		if (getDirection() == none) {
+			setDirection(dir);
+		}
+		if (isVisible() == false) {
+			setVisible(true);
+		}
+		int x = getX();
+		int y = getY();
+		if (getDirection() == up) {
+			if (y < 60-1 && !wrld->isIce(x, y + 4) && !wrld->isIce(x + 1, y + 4) && !wrld->isIce(x + 2, y + 4) && !wrld->isIce(x + 3, y + 4)) {
+				moveTo(x, y + 2);
+			} else {
+				remaining = 0;
+				return;
+			}
+		} else if (getDirection() == right) {
+			if (x < 60-1 && !wrld->isIce(x + 4, y) && !wrld->isIce(x + 4, y + 1) && !wrld->isIce(x + 4, y + 2) && !wrld->isIce(x + 4, y + 3)) {
+				moveTo(x + 2, y);
+			} else {
+				remaining = 0;
+				return;
+			}
+		} else if (getDirection() == down) {
+			if (y > 0+1 && !wrld->isIce(x, y - 1) && !wrld->isIce(x + 1, y - 1) && !wrld->isIce(x + 2, y - 1) && !wrld->isIce(x + 3, y - 1)) {
+				moveTo(x, y - 2);
+			} else {
+				remaining = 0;
+				return;
+			}
+		} else {
+			if (x > 0+1 && !wrld->isIce(x - 1, y) && !wrld->isIce(x - 1, y + 1) && !wrld->isIce(x - 1, y + 2) && !wrld->isIce(x - 1, y + 3)) {
+				moveTo(x - 2, y);
+			} else {
+				remaining = 0;
+				return;
+			}
+		}
+		--remaining;
+		cooldown = 10;
+	} else {
+		--cooldown;
+	}
+}
+
+bool Squirt::isAlive() {
+	return (remaining != 0);
+}

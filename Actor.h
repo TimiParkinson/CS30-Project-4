@@ -110,7 +110,7 @@ private:
 class OilBarrel : public Interactable {
 public:
     OilBarrel(int startX, int startY, StudentWorld* sp) : Interactable(IID_BARREL, SOUND_FOUND_OIL, startX, startY, right, 1.0, 2, sp) {
-        setVisible(false); //set to false, finished testing
+        setVisible(true); //set to false, finished testing
     }
     virtual ~OilBarrel() {}
     virtual void doSomething() override;
@@ -119,10 +119,10 @@ public:
 class GoldNugget : public Interactable {
 public:
     GoldNugget(int startX, int startY, StudentWorld* sp) : Interactable(IID_GOLD, SOUND_GOT_GOODIE, startX, startY, right, 1.0, 2, sp) {
-        setVisible(true); // Remove after testing, unintended behavior
+        setVisible(true); //set to false, finished testing
     }
     virtual ~GoldNugget() {}
-    virtual void doSomething() {}
+    virtual void doSomething() override;
 };
 
 class SonarKit : public Interactable {

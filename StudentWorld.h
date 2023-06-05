@@ -20,6 +20,9 @@ class Squirt;
 class Ice;
 class Boulder;
 class OilBarrel;
+class GoldNugget;
+class SonarKit;
+class WaterPool;
 
 constexpr int ICE_WIDTH = 64;
 constexpr int ICE_HEIGHT = 60;
@@ -155,6 +158,8 @@ class StudentWorld : public GameWorld {
         Boulder* spawnActor<Boulder>();
         template <>
         OilBarrel* spawnActor<OilBarrel>();
+        template <>
+        GoldNugget* spawnActor<GoldNugget>();
         void removeActor(Actor* actor) noexcept;
      public:
         Stage(StudentWorld* swp) : m_studentWorldPointer(swp) {

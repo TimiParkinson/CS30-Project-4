@@ -125,6 +125,7 @@ void StudentWorld::GameStats::init() noexcept {
     m_boulderCount = min(m_levelCount / 2 + 2, 9);
     m_goldCount = max(5 - m_levelCount / 2, 2);
     m_barrelCount = min(2 + m_levelCount, 21);
+
 }
 string StudentWorld::GameStats::toString() const noexcept {
     return "<game statistics>";
@@ -262,10 +263,20 @@ OilBarrel* StudentWorld::Stage::spawnActor<OilBarrel>() {
 	
 }
 
+template <>
+GoldNugget* StudentWorld::Stage::spawnActor<GoldNugget>() {
+	static GoldNugget* newGoldNugget = nullptr;
+	pair<int, int> randomPosition = getRandomPosition();
+
+	newGoldNugget = new GoldNugget(randomPosition.first, randomPosition.second, m_studentWorldPointer);
+	self.insert(newGoldNugget);
+	return newGoldNugget;
+}
 
 void StudentWorld::Stage::removeActor(Actor* actor) noexcept {
 	self.erase(actor);
 }
+
 void StudentWorld::Stage::init() {
 
 	for (int i = 0; i < m_studentWorldPointer->m_stats.getBoulders(); i++) {
@@ -274,6 +285,10 @@ void StudentWorld::Stage::init() {
 	
 	for (int spawnBarrel = 0; spawnBarrel < m_studentWorldPointer->m_stats.getBarrels(); spawnBarrel++) {
 		spawnActor<OilBarrel>();
+	}
+
+	for (int spawnGold = 0; spawnGold < m_studentWorldPointer->m_stats.getGold(); spawnGold++) {
+		spawnActor<GoldNugget>();
 	}
 }
 /*

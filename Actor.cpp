@@ -240,6 +240,18 @@ void OilBarrel::doSomething() {
 	}
 }
 
+void GoldNugget::doSomething() {
+	if (!isAlive()) return;
+
+	if (!isVisible() && detectPlayer(4)) {
+		setVisible(true);
+		return;
+	}
+	else if (detectPlayer(3)) {
+		unAlive();
+		//increase score by 10
+	}
+}
 
 double euclidianDistance(int x1, int y1, int x2, int y2) {
 	return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2) * 1.0);

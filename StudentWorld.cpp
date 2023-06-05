@@ -67,8 +67,16 @@ int StudentWorld::move() {
 	}
 
 	m_Protestor->doSomething();
+	if (m_stats.getHealth() <= 0) {
+		m_stats.m_lifeCount--;
+		m_stats.m_healthCount = 100;
+		return GWSTATUS_PLAYER_DIED;
+	} else if (m_stats.getBarrels() == 0) {
+		return GWSTATUS_FINISHED_LEVEL;
+	} else if (m_stats.getLives() == 0) {
+		return GWSTATUS_PLAYER_DIED;
+	}
 
-	// Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
 	return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -114,9 +122,23 @@ int StudentWorld::playerY() const {
     return m_iceman->getY();
 }
 
+void StudentWorld::takeDamage(int dmg) {
+	playSound(SOUND_PROTESTER_YELL);
+	m_stats.m_healthCount -= dmg * 10;
+}
+
+void StudentWorld::protestorGiveUp() {
+	playSound(SOUND_PROTESTER_GIVE_UP);
+}
+
 void StudentWorld::createSquirt(int x, int y) noexcept {
     playSound(SOUND_PLAYER_SQUIRT);
     m_squirt = new Squirt(x, y);
+	m_stats.m_squirtCount--;
+}
+
+Squirt* StudentWorld::getSquirt() {
+	return m_squirt;
 }
 #pragma endregion StudentWorld
 
@@ -128,7 +150,15 @@ void StudentWorld::GameStats::init() noexcept {
 
 }
 string StudentWorld::GameStats::toString() const noexcept {
-    return "<game statistics>";
+	string lvlTxt, hlthTxt, wtrTxt, gldTxt, oilTxt, snrTxt, scrTxt;
+	if (m_levelCount < 10) { lvlTxt = " " + std::to_string(m_levelCount); } else { lvlTxt = std::to_string(m_levelCount); }
+	if (m_healthCount < 10) { hlthTxt = "  " + std::to_string(m_healthCount) + "%"; } else if (m_healthCount < 100) { hlthTxt = " " + std::to_string(m_healthCount) + "%"; } else { hlthTxt = std::to_string(m_healthCount) + "%"; }
+	if (m_squirtCount < 10) { wtrTxt = " " + std::to_string(m_squirtCount); } else { wtrTxt = std::to_string(m_squirtCount); }
+	if (mm_goldCount < 10) { gldTxt = " " + std::to_string(mm_goldCount); } else { gldTxt = std::to_string(mm_goldCount); }
+	if (m_barrelCount < 10) { oilTxt = " " + std::to_string(m_barrelCount); } else { oilTxt = std::to_string(m_barrelCount); }
+	if (mm_sonarCount < 10) { snrTxt = " " + std::to_string(mm_sonarCount); } else { snrTxt = std::to_string(mm_sonarCount); }
+	if (m_scoreCount < 10) { scrTxt = "00000" + std::to_string(m_scoreCount); } else if (m_scoreCount < 100) { scrTxt = "0000" + std::to_string(m_scoreCount); } else if (m_scoreCount < 1000) { scrTxt = "000" + std::to_string(m_scoreCount); } else if (m_scoreCount < 10000) { scrTxt = "00" + std::to_string(m_scoreCount); } else if (m_scoreCount < 100000) { scrTxt = "0" + std::to_string(m_scoreCount); } else { scrTxt = std::to_string(m_scoreCount); }
+	return "Lvl: " +lvlTxt+ "  Lives: " +std::to_string(m_lifeCount)+ "  Hlth: "+hlthTxt+"  Wtr: "+wtrTxt+"  Gld: "+gldTxt+"  Oil Left: "+oilTxt+"  Sonar: "+snrTxt+" Scr: "+scrTxt;
 }
 
 // Getters

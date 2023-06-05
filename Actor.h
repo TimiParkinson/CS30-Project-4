@@ -103,14 +103,13 @@ class Interactable : public Object {
     virtual ~Interactable() {}
     virtual void doSomething() = 0;
     bool detectPlayer(int distance); //detects if player is within a certain distance
-private:
     StudentWorld* m_studentWorldPointer;
 };
 
 class OilBarrel : public Interactable {
 public:
     OilBarrel(int startX, int startY, StudentWorld* sp) : Interactable(IID_BARREL, SOUND_FOUND_OIL, startX, startY, right, 1.0, 2, sp) {
-        setVisible(true); //set to false, finished testing
+        setVisible(false);
     }
     virtual ~OilBarrel() {}
     virtual void doSomething() override;
@@ -119,7 +118,7 @@ public:
 class GoldNugget : public Interactable {
 public:
     GoldNugget(int startX, int startY, StudentWorld* sp) : Interactable(IID_GOLD, SOUND_GOT_GOODIE, startX, startY, right, 1.0, 2, sp) {
-        setVisible(true); //set to false, finished testing
+        setVisible(false);
     }
     virtual ~GoldNugget() {}
     virtual void doSomething() override;
@@ -128,7 +127,7 @@ public:
 class SonarKit : public Interactable {
 public:
     SonarKit(int startX, int startY, StudentWorld* sp) : Interactable(IID_SONAR, SOUND_GOT_GOODIE, startX, startY, right, 1.0, 2, sp) {
-        setVisible(true); // Remove after testing, unintended behavior
+        setVisible(true);
     }
     virtual ~SonarKit() {}
     virtual void doSomething() {}
@@ -151,9 +150,11 @@ class Entity : public Actor {
       Actor(imageID, soundID, startX, startY, dir, 1.0, 0), health(health), m_studentWorldPointer(sp) { setVisible(true); }
 	virtual ~Entity() {}
 	StudentWorld* getWorld() const noexcept;
+    void setHealth(int h);
+    int getHealth() const;
 	virtual void doSomething() = 0;
+    unsigned int health;
 private:
-	unsigned int health;
 	StudentWorld* m_studentWorldPointer;
 };
 

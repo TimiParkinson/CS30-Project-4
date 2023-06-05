@@ -5,6 +5,14 @@ StudentWorld* Entity::getWorld() const noexcept {
 	return m_studentWorldPointer;
 }
 
+void Entity::setHealth(int h) {
+	health = h;
+}
+
+int Entity::getHealth() const {
+	return health;
+}
+
 bool Actor::isAlive() const {
 	return m_alive;
 }
@@ -61,7 +69,7 @@ void Iceman::doSomething(Squirt* sq) {
                 break;
             }
         case KEY_PRESS_SPACE:
-			getWorld()->createSquirt(getX(), getY());
+			if (getWorld()->m_stats.m_squirtCount != 0 && getWorld()->getSquirt() == nullptr) getWorld()->createSquirt(getX(), getY());
 			break;
         }
         getWorld()->removeIce();
@@ -166,25 +174,40 @@ void Protestor::makeMovement() {
 
 void Protestor::doSomething() {
 	if (isLeaving) {
-
+		if (isVisible() && getX() == 60 && getY() == 60) {
+			setVisible(false);
+		} else {
+			makeMovement();
+		}
+		return;
 	} else if (waitTime != 0) {
 		waitTime--;
 	} else {
-		if ((shoutCooldown == 0) && (euclidianDistance(getX(), getY(), getWorld()->playerX(), getWorld()->playerY()) <= 4)) {
-			getWorld()->takeDamage(2);
-			shoutCooldown = 15;
-			return;
-		} else if (shoutCooldown != 0) {
-			shoutCooldown--;
+		if (euclidianDistance(getX(), getY(), getWorld()->playerX(), getWorld()->playerY()) <= 4) {
+			if (shoutCooldown == 0) {
+				getWorld()->takeDamage(2);
+				shoutCooldown = 15;
+				return;
+			}
+		} else {
+			makeMovement();
 		}
 
-		makeMovement();
+		if (shoutCooldown != 0) shoutCooldown--;
 		waitTime = std::max(0, 3 - getWorld()->m_stats.m_levelCount / 4);
 	}
 	
-	//if (euclidianDistance(getX(), getY(), getWorld()->playerX(), getWorld()->playerY()) <= 4) {
-	//	// Take Damage from water
-	//}
+	if (getWorld()->getSquirt() != nullptr && euclidianDistance(getX(), getY(), getWorld()->getSquirt()->getX(), getWorld()->getSquirt()->getY()) <= 4) {
+		health--;
+		if (health == 0) {
+			isLeaving = true;
+			getWorld()->protestorGiveUp();
+			if (getDirection() == down) setDirection(up);
+			if (getDirection() == left) setDirection(right);
+			if (getDirection() == right) setDirection(left);
+			if (getDirection() == up) setDirection(down);
+		}
+	}
 }
 
 void HardcoreProtestor::doSomething() {
@@ -264,6 +287,7 @@ void GoldNugget::doSomething() {
 		unAlive();
 		m_studentWorldPointer->m_stats.m_scoreCount += 10;
 		m_studentWorldPointer->m_stats.m_goldCount--;
+		m_studentWorldPointer->m_stats.mm_goldCount++;
 	}
 }
 

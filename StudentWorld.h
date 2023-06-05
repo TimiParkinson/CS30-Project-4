@@ -198,7 +198,10 @@ public:
 
     void takeDamage(int dmg);
 
+    void protestorGiveUp();
+
     void createSquirt(int x, int y) noexcept;
+    Squirt* getSquirt();
     GameStats m_stats;
 };
 

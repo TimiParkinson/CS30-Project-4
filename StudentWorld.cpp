@@ -101,6 +101,14 @@ bool StudentWorld::isIce(int x, int y) const noexcept {
 	return m_oilField.isIce(x, y);
 }
 
+int StudentWorld::playerX() const {
+	return m_iceman->getX();
+}
+
+int StudentWorld::playerY() const {
+	return m_iceman->getY();
+}
+
 #pragma endregion StudentWorld
 
 #pragma region GameStats
@@ -233,7 +241,7 @@ OilBarrel* StudentWorld::Stage::spawnActor<OilBarrel>() {
 	static OilBarrel* newOilBarrel = nullptr;
 	pair<int, int> randomPosition = getRandomPosition();
 
-	newOilBarrel = new OilBarrel(randomPosition.first, randomPosition.second);
+	newOilBarrel = new OilBarrel(randomPosition.first, randomPosition.second, m_studentWorldPointer);
 	self.insert(newOilBarrel);
 	return newOilBarrel;
 
@@ -252,7 +260,7 @@ void StudentWorld::Stage::init() {
 		spawnActor<Boulder>();
 	}
 	
-	for (int spawnOil = 0; spawnOil < m_studentWorldPointer->m_stats.getBarrels(); spawnOil++) {
+	for (int spawnBarrel = 0; spawnBarrel < m_studentWorldPointer->m_stats.getBarrels(); spawnBarrel++) {
 		spawnActor<OilBarrel>();
 	}
 }
@@ -279,7 +287,17 @@ void StudentWorld::Stage::init() {
  */
 void StudentWorld::Stage::move() {
 	for (auto i : self) {
-		i->doSomething();
+		if (i != nullptr) {
+			i->doSomething();
+			if (!i->isAlive()) {
+				m_studentWorldPointer->playSound(i->getDeathSound());
+				//self.erase(i);
+				delete i;
+				i = nullptr;
+			}
+		}
 	}
+
 }
+
 #pragma endregion Stage

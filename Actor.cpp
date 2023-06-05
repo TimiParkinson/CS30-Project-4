@@ -5,6 +5,18 @@ StudentWorld* Entity::getWorld() const noexcept {
 	return m_studentWorldPointer;
 }
 
+bool Actor::isAlive() const {
+	return m_alive;
+}
+
+void Actor::unAlive() {
+	m_alive = false;
+}
+
+const int Actor::getDeathSound() const {
+	return m_soundID;
+}
+
 #pragma region Iceman
 void Iceman::doSomething() {
 
@@ -153,6 +165,10 @@ void HardcoreProtestor::doSomething() {
 }
 #pragma endregion Protestor
 
+bool Interactable::detectPlayer(int distance) {
+	return (euclidianDistance(getX(), getY(), m_studentWorldPointer->playerX(), m_studentWorldPointer->playerY()) <= distance);
+}
+
 #pragma region Boulder
 void Boulder::doSomething() {
     m_state->doSomething();
@@ -198,10 +214,22 @@ void Boulder::Falling::doSomething() {
 
 #pragma region Oil Barrel
 void OilBarrel::doSomething() {
-	return; 
-	// FIX ME
-	//not sure how to access setVisible()
-	//if u have any suggestions pls comment it 
+	if (!isAlive()) return;
+	
+	if (!isVisible() && detectPlayer(4)) {
+		setVisible(true);
+		return;
+	}
+	else if (detectPlayer(3)) {
+		unAlive();
+		//increase score by 1000
+
+	}
+}
+
+
+double euclidianDistance(int x1, int y1, int x2, int y2) {
+	return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2) * 1.0);
 }
 
 #pragma endregion Oil Barrel

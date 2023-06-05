@@ -182,6 +182,9 @@ public:
 	virtual void cleanUp() noexcept override;
 	void removeIce() noexcept;
 	bool isIce(int x, int y) const noexcept;
+    int playerX() const;
+    int playerY() const;
+
 };
 
 #endif // STUDENTWORLD_H_

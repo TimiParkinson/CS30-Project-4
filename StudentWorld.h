@@ -96,21 +96,25 @@ class StudentWorld : public GameWorld {
     #pragma region GameStats
     class GameStats {
      private:
-         StudentWorld* m_studentWorldPointer;
-
-        int m_levelCount;
-        int m_lifeCount;
-        int m_scoreCount;
-        int m_healthCount;
-        int m_squirtCount;
-        int m_goldCount;
-        int m_barrelCount;
-        int m_sonarCount;
-        int m_boulderCount;
+        StudentWorld* m_studentWorldPointer;
      public:
         GameStats(StudentWorld* swp) : m_studentWorldPointer(swp), m_levelCount(swp->getLevel()), m_lifeCount(swp->getLives()), m_scoreCount(swp->getScore()) {}
         void init() noexcept;
         std::string toString() const noexcept;
+
+        int m_levelCount = 1;
+        int m_lifeCount = 3;
+        int m_scoreCount = 0;
+        int m_healthCount = 100;
+        int m_squirtCount = 5;
+        int mm_goldCount = 0;
+        int mm_barrelCount = 0;
+        int mm_sonarCount = 0;
+
+        int m_goldCount;
+        int m_barrelCount;
+        int m_sonarCount;
+        int m_boulderCount;
 
         // Getters
         int getLevel() const noexcept;
@@ -175,7 +179,6 @@ class StudentWorld : public GameWorld {
     };
     #pragma endregion Stage
 
-    GameStats m_stats;
     OilField m_oilField;
     Stage m_stage;
     Iceman* m_iceman;
@@ -193,8 +196,10 @@ public:
     int playerX() const;
     int playerY() const;
 
-    void createSquirt(int x, int y) noexcept;
+    void takeDamage(int dmg);
 
+    void createSquirt(int x, int y) noexcept;
+    GameStats m_stats;
 };
 
 #endif // STUDENTWORLD_H_

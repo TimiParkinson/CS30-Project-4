@@ -170,8 +170,21 @@ void Protestor::doSomething() {
 	} else if (waitTime != 0) {
 		waitTime--;
 	} else {
+		if ((shoutCooldown == 0) && (euclidianDistance(getX(), getY(), getWorld()->playerX(), getWorld()->playerY()) <= 4)) {
+			getWorld()->takeDamage(2);
+			shoutCooldown = 15;
+			return;
+		} else if (shoutCooldown != 0) {
+			shoutCooldown--;
+		}
+
 		makeMovement();
+		waitTime = std::max(0, 3 - getWorld()->m_stats.m_levelCount / 4);
 	}
+	
+	//if (euclidianDistance(getX(), getY(), getWorld()->playerX(), getWorld()->playerY()) <= 4) {
+	//	// Take Damage from water
+	//}
 }
 
 void HardcoreProtestor::doSomething() {
@@ -235,8 +248,8 @@ void OilBarrel::doSomething() {
 	}
 	else if (detectPlayer(3)) {
 		unAlive();
-		//increase score by 1000
-
+		m_studentWorldPointer->m_stats.m_scoreCount += 1000;
+		m_studentWorldPointer->m_stats.m_barrelCount--;
 	}
 }
 
@@ -249,7 +262,8 @@ void GoldNugget::doSomething() {
 	}
 	else if (detectPlayer(3)) {
 		unAlive();
-		//increase score by 10
+		m_studentWorldPointer->m_stats.m_scoreCount += 10;
+		m_studentWorldPointer->m_stats.m_goldCount--;
 	}
 }
 

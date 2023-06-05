@@ -103,7 +103,6 @@ class Interactable : public Object {
     virtual ~Interactable() {}
     virtual void doSomething() = 0;
     bool detectPlayer(int distance); //detects if player is within a certain distance
-private:
     StudentWorld* m_studentWorldPointer;
 };
 

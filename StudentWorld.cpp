@@ -286,18 +286,19 @@ void StudentWorld::Stage::init() {
  }
  */
 void StudentWorld::Stage::move() {
-	for (auto i : self) {
-		if (i != nullptr) {
-			i->doSomething();
-			if (!i->isAlive()) {
-				m_studentWorldPointer->playSound(i->getDeathSound());
-				//self.erase(i);
-				delete i;
-				i = nullptr;
+	auto it = self.begin();
+	while (it != self.end()) {
+		if (*it != nullptr) {
+			(*it)->doSomething();
+			if (!((*it)->isAlive())) {
+				m_studentWorldPointer->playSound((*it)->getDeathSound());
+				delete (*it);
+				it = self.erase(it);
+				continue;
 			}
 		}
+		it++;
 	}
-
 }
 
 #pragma endregion Stage

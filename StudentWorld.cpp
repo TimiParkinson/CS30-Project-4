@@ -103,12 +103,20 @@ void StudentWorld::removeIce() noexcept {
 }
 
 bool StudentWorld::isIce(int x, int y) const noexcept {
-	return m_oilField.isIce(x, y);
+    return m_oilField.isIce(x, y);
+}
+
+int StudentWorld::playerX() const {
+    return m_iceman->getX();
+}
+
+int StudentWorld::playerY() const {
+    return m_iceman->getY();
 }
 
 void StudentWorld::createSquirt(int x, int y) noexcept {
-	playSound(SOUND_PLAYER_SQUIRT);
-	m_squirt = new Squirt(x, y);
+    playSound(SOUND_PLAYER_SQUIRT);
+    m_squirt = new Squirt(x, y);
 }
 #pragma endregion StudentWorld
 
@@ -224,6 +232,7 @@ T* StudentWorld::Stage::spawnActor() {
 	self.insert(newActor);
 	return newActor;
 }
+
 template <>
 Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
 	static Boulder* newBoulder = nullptr;
@@ -239,12 +248,19 @@ Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
 	return newBoulder;
 }
 
-//OilBarrel* StudentWorld::Stage::spawnActor<OilBarrel>() {
-//	static OilBarrel* newOilBarrel = nullptr;
-//	pair<int, int> randomPosition = getRandomPosition();
-//
-//	if()
-//}
+template <>
+OilBarrel* StudentWorld::Stage::spawnActor<OilBarrel>() {
+	static OilBarrel* newOilBarrel = nullptr;
+	pair<int, int> randomPosition = getRandomPosition();
+
+	newOilBarrel = new OilBarrel(randomPosition.first, randomPosition.second, m_studentWorldPointer);
+	self.insert(newOilBarrel);
+	return newOilBarrel;
+
+	//FIX ME
+	//not sure how to seperate barrels by 6 blocks
+	
+}
 
 
 void StudentWorld::Stage::removeActor(Actor* actor) noexcept {
@@ -254,6 +270,10 @@ void StudentWorld::Stage::init() {
 
 	for (int i = 0; i < m_studentWorldPointer->m_stats.getBoulders(); i++) {
 		spawnActor<Boulder>();
+	}
+	
+	for (int spawnBarrel = 0; spawnBarrel < m_studentWorldPointer->m_stats.getBarrels(); spawnBarrel++) {
+		spawnActor<OilBarrel>();
 	}
 }
 /*
@@ -278,8 +298,19 @@ void StudentWorld::Stage::init() {
  }
  */
 void StudentWorld::Stage::move() {
-	for (auto i : self) {
-		i->doSomething();
+	auto it = self.begin();
+	while (it != self.end()) {
+		if (*it != nullptr) {
+			(*it)->doSomething();
+			if (!((*it)->isAlive())) {
+				m_studentWorldPointer->playSound((*it)->getDeathSound());
+				delete (*it);
+				it = self.erase(it);
+				continue;
+			}
+		}
+		it++;
 	}
 }
+
 #pragma endregion Stage

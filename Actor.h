@@ -7,45 +7,53 @@ class StudentWorld;
 
 class Actor : public GraphObject {
  public:
-    Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0)
-        : GraphObject(imageID, startX, startY, dir, size, depth) {}
+    Actor(int imageID, int soundID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0)
+        : GraphObject(imageID, startX, startY, dir, size, depth), m_alive(true), m_soundID(soundID) {}
     virtual ~Actor() {}
 
     virtual void doSomething() = 0;
+    bool isAlive() const;
+    void unAlive();
+    const int getDeathSound() const;
+private:
+    bool m_alive;
+    const int m_soundID = 0;
 };
 
 #pragma region Objects
 class Object : public Actor {
-public:
-    Object(int imageID, int startX = 0, int startY = 0, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Actor(imageID, startX, startY, dir, size, depth) {}
-    virtual ~Object() {}
-
+ public:
+    Object(int imageID, int soundID, int startX = 0, int startY = 0, Direction dir = right, double size = 1.0, unsigned int depth = 0) : 
+        Actor(imageID, soundID, startX, startY, dir, size, depth) {}
+    virtual ~Object(){}
     virtual void doSomething() = 0;
 };
+
 #pragma region Terrain
 class Terrain : public Object {
-public:
-    Terrain(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : Object(imageID, startX, startY, dir, size, depth) { setVisible(true); }
-    Terrain(int imageID) : Object(imageID) {}
+ public:
+    Terrain(int imageID, int soundID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) :
+        Object(imageID, soundID, startX, startY, dir, size, depth) { setVisible(true); }
     virtual ~Terrain() {}
 
     virtual void doSomething() = 0;
 };
 
 class Ice : public Terrain {
-public:
-    Ice(int startX, int startY, Direction dir = right, double size = .25, unsigned int depth = 3) : Terrain(IID_ICE, startX, startY, dir, size, depth) {}
+ public:
+    Ice(int startX, int startY, Direction dir = right, double size = .25, unsigned int depth = 3) : 
+        Terrain(IID_ICE, SOUND_NONE, startX, startY, dir, size, depth) {}
     virtual ~Ice() {}
     virtual void doSomething() override {}
 };
 
 class Boulder : public Terrain {
 private:
-#pragma region State
-     class State {
-     private:
-         Boulder* m_boulderPointer;
-     public:
+    #pragma region State
+    class State {
+    private:
+        Boulder* m_boulderPointer;
+    public:
         State() : m_boulderPointer(nullptr) {}
         State(Boulder* boulder) : m_boulderPointer(boulder) {}
         virtual void doSomething() = 0;
@@ -75,10 +83,11 @@ private:
         virtual void doSomething() override;
         virtual ~Falling() {}
     };
-#pragma endregion State
+    #pragma endregion State
     State* m_state;
-public:
-    Boulder(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 1) : Terrain(IID_BOULDER, startX, startY, dir, size, depth), m_state(new Idle(this)) {}
+ public:
+    Boulder(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 1) : 
+        Terrain(IID_BOULDER, SOUND_FALLING_ROCK, startX, startY, dir, size, depth), m_state(new Idle(this)) {}
     virtual ~Boulder();
 
     void setState(std::string s);
@@ -88,50 +97,46 @@ public:
 
 #pragma region Interactable
 class Interactable : public Object {
-public:
-    Interactable(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) :
-        Object(imageID, startX, startY, dir, size, depth) {}
-    Interactable(int imageID) : Object(imageID) {}
+ public:
+     Interactable(int imageID, int soundID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* sp) :
+         Object(imageID, soundID, startX, startY, dir, size, depth), m_studentWorldPointer(sp) {}
     virtual ~Interactable() {}
     virtual void doSomething() = 0;
+    bool detectPlayer(int distance); //detects if player is within a certain distance
+private:
+    StudentWorld* m_studentWorldPointer;
 };
 
 class OilBarrel : public Interactable {
 public:
-    OilBarrel(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
-        Interactable(IID_BARREL, startX, startY, dir, size, depth) {
-        setVisible(true); // Remove after testing, unintended behavior
+    OilBarrel(int startX, int startY, StudentWorld* sp) : Interactable(IID_BARREL, SOUND_FOUND_OIL, startX, startY, right, 1.0, 2, sp) {
+        setVisible(false); //set to false, finished testing
     }
     virtual ~OilBarrel() {}
-    virtual void doSomething() {}
+    virtual void doSomething() override;
 };
 
 class GoldNugget : public Interactable {
 public:
-    GoldNugget(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
-        Interactable(IID_GOLD, startX, startY, dir, size, depth) {
+    GoldNugget(int startX, int startY, StudentWorld* sp) : Interactable(IID_GOLD, SOUND_GOT_GOODIE, startX, startY, right, 1.0, 2, sp) {
         setVisible(true); // Remove after testing, unintended behavior
     }
-
     virtual ~GoldNugget() {}
     virtual void doSomething() {}
 };
 
 class SonarKit : public Interactable {
 public:
-    SonarKit(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
-        Interactable(IID_SONAR, startX, startY, dir, size, depth) {
+    SonarKit(int startX, int startY, StudentWorld* sp) : Interactable(IID_SONAR, SOUND_GOT_GOODIE, startX, startY, right, 1.0, 2, sp) {
         setVisible(true); // Remove after testing, unintended behavior
     }
-
     virtual ~SonarKit() {}
     virtual void doSomething() {}
 };
 
 class WaterPool : public Interactable {
 public:
-    WaterPool(int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 2) :
-        Interactable(IID_WATER_POOL, startX, startY, dir, size, depth) {
+    WaterPool(int startX, int startY, StudentWorld* sp) : Interactable(IID_WATER_POOL, SOUND_GOT_GOODIE, startX, startY, right, 1.0, 2, sp) {
         setVisible(true);
     }
     virtual ~WaterPool() {}
@@ -139,11 +144,11 @@ public:
 };
 #pragma endregion Interactable
 #pragma endregion Objects
-
 #pragma region Entities
 class Entity : public Actor {
  public:
-	Entity(int imageID, int startX, int startY, Direction dir, StudentWorld* sp, int health) : Actor(imageID, startX, startY, dir, 1.0, 0), health(health), m_studentWorldPointer(sp) { setVisible(true); }
+	Entity(int imageID, int soundID, int startX, int startY, Direction dir, StudentWorld* sp, int health) :
+      Actor(imageID, soundID, startX, startY, dir, 1.0, 0), health(health), m_studentWorldPointer(sp) { setVisible(true); }
 	virtual ~Entity() {}
 	StudentWorld* getWorld() const noexcept;
 	virtual void doSomething() = 0;
@@ -152,12 +157,9 @@ private:
 	StudentWorld* m_studentWorldPointer;
 };
 
-class Squirt : public Interactable {
+class Squirt : public Actor {
 public:
-    Squirt(int startX, int startY, Direction dir = none, double size = 1.0, unsigned int depth = 2) :
-        Interactable(IID_WATER_SPURT, startX, startY, dir, size, depth) {
-        setVisible(false);
-    }
+    Squirt(int startX, int startY) : Actor(IID_WATER_SPURT, SOUND_NONE, startX, startY, none, 1.0, 2) { setVisible(false); }
     virtual ~Squirt() {}
     void doSomething() {}
     void doSomething(Direction dir, StudentWorld* wrld);
@@ -169,17 +171,17 @@ private:
 
 class Iceman : public Entity {
  public:
-	Iceman(StudentWorld* sp = nullptr) : Entity(IID_PLAYER, 30, 60, right, sp, 10) {}
+	Iceman(StudentWorld* sp = nullptr) : Entity(IID_PLAYER, SOUND_NONE, 30, 60, right, sp, 10) {}
 	virtual ~Iceman() {}
-    void doSomething() {}
+  void doSomething() {}
 	void doSomething(Squirt* sq);
  private:
 };
 
 class Protestor : public Entity {
  public:
-	Protestor(StudentWorld* sp = nullptr, Iceman* im = nullptr) : Entity(IID_PROTESTER, 60, 60, left, sp, 5), iceman(im) {}
-	Protestor(StudentWorld* sp, Iceman* im, const int imageID, unsigned int health) : Entity(imageID, 60, 60, left, sp, health), iceman(im) {}
+	Protestor(StudentWorld* sp = nullptr, Iceman* im = nullptr) : Entity(IID_PROTESTER, SOUND_NONE, 60, 60, left, sp, 5), iceman(im) {}
+	Protestor(StudentWorld* sp, Iceman* im, const int imageID, unsigned int health) : Entity(imageID, SOUND_NONE, 60, 60, left, sp, health), iceman(im) {}
 	virtual ~Protestor() {}
 	virtual void doSomething();
 	virtual void makeMovement();
@@ -200,4 +202,7 @@ class HardcoreProtestor : public Protestor {
  private:
 };
 #pragma endregion Entities
+
+double euclidianDistance(int x1, int x2, int y1, int y2);
+
 #endif // ACTOR_H_

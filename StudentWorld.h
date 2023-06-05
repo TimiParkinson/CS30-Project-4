@@ -176,14 +176,20 @@ class StudentWorld : public GameWorld {
     Iceman* m_iceman;
     Squirt* m_squirt;
 public:
-	StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceman(nullptr), m_stats(this), m_stage(this) {}
-	virtual ~StudentWorld() override;
-	virtual int init() override;
-	virtual int move() override;
-	virtual void cleanUp() noexcept override;
-	void removeIce() noexcept;
-	bool isIce(int x, int y) const noexcept;
+    StudentWorld(std::string assetDir) : GameWorld(assetDir), m_iceman(nullptr), m_stats(this), m_stage(this) {}
+    virtual ~StudentWorld() override;
+    virtual int init() override;
+    virtual int move() override;
+    virtual void cleanUp() noexcept override;
+  
+    void removeIce() noexcept;
+    bool isIce(int x, int y) const noexcept;
+
+    int playerX() const;
+    int playerY() const;
+
     void createSquirt(int x, int y) noexcept;
+
 };
 
 #endif // STUDENTWORLD_H_

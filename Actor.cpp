@@ -1,6 +1,9 @@
 #include "Actor.h"
 #include "StudentWorld.h"
 
+class StudentWorld;
+class GameStats;
+
 StudentWorld* Entity::getWorld() const noexcept {
 	return m_studentWorldPointer;
 }
@@ -289,6 +292,17 @@ void GoldNugget::doSomething() {
 		m_studentWorldPointer->m_stats.m_goldCount--;
 		m_studentWorldPointer->m_stats.mm_goldCount++;
 	}
+}
+
+void SonarKit::doSomething() {
+
+	if (!isAlive()) return;
+
+	if (detectPlayer(3) || m_sonarKitTimer == 0) {
+		unAlive();
+	}
+
+	m_sonarKitTimer--;
 }
 
 double euclidianDistance(int x1, int y1, int x2, int y2) {

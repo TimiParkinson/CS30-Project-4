@@ -103,6 +103,7 @@ class Interactable : public Object {
     virtual ~Interactable() {}
     virtual void doSomething() = 0;
     bool detectPlayer(int distance); //detects if player is within a certain distance
+ protected:
     StudentWorld* m_studentWorldPointer;
 };
 
@@ -126,11 +127,13 @@ public:
 
 class SonarKit : public Interactable {
 public:
-    SonarKit(int startX, int startY, StudentWorld* sp) : Interactable(IID_SONAR, SOUND_GOT_GOODIE, startX, startY, right, 1.0, 2, sp) {
+    SonarKit(StudentWorld* sp, int sonarKitTimer) : Interactable(IID_SONAR, SOUND_NONE, 0, 60, right, 1.0, 2, sp), m_sonarKitTimer(sonarKitTimer) {
         setVisible(true);
     }
     virtual ~SonarKit() {}
-    virtual void doSomething() {}
+    virtual void doSomething() override;
+private:
+    int m_sonarKitTimer;
 };
 
 class WaterPool : public Interactable {
@@ -144,6 +147,7 @@ public:
 #pragma endregion Interactable
 #pragma endregion Objects
 #pragma region Entities
+
 class Entity : public Actor {
  public:
 	Entity(int imageID, int soundID, int startX, int startY, Direction dir, StudentWorld* sp, int health) :

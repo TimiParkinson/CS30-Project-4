@@ -97,6 +97,8 @@ class StudentWorld : public GameWorld {
     class GameStats {
      private:
         StudentWorld* m_studentWorldPointer;
+        int m_goodieCount;
+        int m_sonarKitTimer;
      public:
         GameStats(StudentWorld* swp) : m_studentWorldPointer(swp), m_levelCount(swp->getLevel()), m_lifeCount(swp->getLives()), m_scoreCount(swp->getScore()) {}
         void init() noexcept;
@@ -116,7 +118,7 @@ class StudentWorld : public GameWorld {
         int m_sonarCount;
         int m_boulderCount;
 
-        // Getters
+        //Getters
         int getLevel() const noexcept;
         int getLives() const noexcept;
         int getScore() const noexcept;
@@ -126,6 +128,8 @@ class StudentWorld : public GameWorld {
         int getBarrels() const noexcept;
         int getSonar() const noexcept;
         int getBoulders() const noexcept;
+        int getGoodies() const noexcept;
+        int getSonarKitTimer() const noexcept;
     };
     #pragma endregion GameStats
 
@@ -164,6 +168,10 @@ class StudentWorld : public GameWorld {
         OilBarrel* spawnActor<OilBarrel>();
         template <>
         GoldNugget* spawnActor<GoldNugget>();
+        template <>
+        SonarKit* spawnActor<SonarKit>();
+        template <>
+        WaterPool* spawnActor<WaterPool>();
         void removeActor(Actor* actor) noexcept;
      public:
         Stage(StudentWorld* swp) : m_studentWorldPointer(swp) {

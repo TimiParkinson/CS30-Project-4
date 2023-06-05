@@ -9,18 +9,32 @@ GameWorld* createStudentWorld(string assetDir) {
 }
 
 #pragma region Utilities
-std::mt19937 generatorX { std::random_device{}() };
-std::uniform_int_distribution<> distributionX { 0, ICE_WIDTH - 1 };
-auto get_randomX = std::bind(distributionX, generatorX);
+std::mt19937 generatorXBoulder{ std::random_device{}() };
+std::uniform_int_distribution<> distributionXBoulder { 0, ICE_WIDTH - 4 };
+auto get_randomXBoulder = std::bind(distributionXBoulder, generatorXBoulder);
 
-std::mt19937 generatorY { std::random_device{}() };	
-std::uniform_int_distribution<> distributionY { 0, ICE_HEIGHT - 1 };
-auto get_randomY = std::bind(distributionY, generatorY);
+std::mt19937 generatorYBoulder{ std::random_device{}() };
+std::uniform_int_distribution<> distributionYBoulder{ 20, ICE_HEIGHT - 4 }; //changed it to 20, 56 as Boulders need to be within (0,20) - (60,56)
+auto get_randomYBoulder = std::bind(distributionYBoulder, generatorYBoulder);
 
-std::pair<int, int> getRandomPosition() {
-    int x = get_randomX();
-    int y = get_randomY();
+std::mt19937 generatorXNuggetBarrel{ std::random_device{}() };
+std::uniform_int_distribution<> distributionXNuggetBarrel{ 0, ICE_WIDTH - 4 };
+auto get_randomXNuggetBarrel = std::bind(distributionXNuggetBarrel, generatorXNuggetBarrel);
+
+std::mt19937 generatorYNuggetBarrel{ std::random_device{}() };
+std::uniform_int_distribution<> distributionYNuggetBarrel{ 0, ICE_HEIGHT - 4 };
+auto get_randomYNuggetBarrel = std::bind(distributionYNuggetBarrel, generatorYNuggetBarrel);
+
+std::pair<int, int> getRandomPositionBoulder() {
+    int x = get_randomXBoulder();
+    int y = get_randomYBoulder();
     return std::make_pair(x, y);
+}
+
+std::pair<int, int> getRandomPositionNuggetBarrel() {
+	int x = get_randomXNuggetBarrel();
+	int y = get_randomYNuggetBarrel();
+	return std::make_pair(x, y);
 }
 #pragma endregion Utilities
 
@@ -147,7 +161,8 @@ void StudentWorld::GameStats::init() noexcept {
     m_boulderCount = min(m_levelCount / 2 + 2, 9);
     m_goldCount = max(5 - m_levelCount / 2, 2);
     m_barrelCount = min(2 + m_levelCount, 21);
-
+	m_goodieCount = m_levelCount * 25 + 300;
+	m_sonarKitTimer = max(100, 300 - 10 * m_levelCount);
 }
 string StudentWorld::GameStats::toString() const noexcept {
 	string lvlTxt, hlthTxt, wtrTxt, gldTxt, oilTxt, snrTxt, scrTxt;
@@ -188,6 +203,12 @@ int StudentWorld::GameStats::getSonar() const noexcept {
 }
 int StudentWorld::GameStats::getBoulders() const noexcept {
 	return m_boulderCount;
+}
+int StudentWorld::GameStats::getGoodies() const noexcept {
+	return m_goodieCount;
+}
+int StudentWorld::GameStats::getSonarKitTimer() const noexcept {
+	return m_sonarKitTimer;
 }
 #pragma endregion GameStats
 
@@ -267,7 +288,7 @@ T* StudentWorld::Stage::spawnActor() {
 template <>
 Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
 	static Boulder* newBoulder = nullptr;
-	pair<int, int> randomPosition = getRandomPosition();
+	pair<int, int> randomPosition = getRandomPositionBoulder();
 
 	if (!m_boulderBlackList.isListed(randomPosition)) {
 		m_boulderBlackList.add(randomPosition);
@@ -282,7 +303,7 @@ Boulder* StudentWorld::Stage::spawnActor<Boulder>() {
 template <>
 OilBarrel* StudentWorld::Stage::spawnActor<OilBarrel>() {
 	static OilBarrel* newOilBarrel = nullptr;
-	pair<int, int> randomPosition = getRandomPosition();
+	pair<int, int> randomPosition = getRandomPositionNuggetBarrel();
 
 	newOilBarrel = new OilBarrel(randomPosition.first, randomPosition.second, m_studentWorldPointer);
 	self.insert(newOilBarrel);
@@ -296,11 +317,25 @@ OilBarrel* StudentWorld::Stage::spawnActor<OilBarrel>() {
 template <>
 GoldNugget* StudentWorld::Stage::spawnActor<GoldNugget>() {
 	static GoldNugget* newGoldNugget = nullptr;
-	pair<int, int> randomPosition = getRandomPosition();
+	pair<int, int> randomPosition = getRandomPositionNuggetBarrel();
 
 	newGoldNugget = new GoldNugget(randomPosition.first, randomPosition.second, m_studentWorldPointer);
 	self.insert(newGoldNugget);
 	return newGoldNugget;
+}
+
+template <>
+SonarKit* StudentWorld::Stage::spawnActor<SonarKit>() {
+	static SonarKit* newSonarKit = new SonarKit(m_studentWorldPointer, m_studentWorldPointer->m_stats.getSonarKitTimer());
+	self.insert(newSonarKit);
+	return newSonarKit;
+}
+
+template <>
+WaterPool* StudentWorld::Stage::spawnActor<WaterPool>() {
+	static WaterPool* newWaterPool = new WaterPool(1, 1, m_studentWorldPointer);
+	self.insert(newWaterPool);
+	return newWaterPool;
 }
 
 void StudentWorld::Stage::removeActor(Actor* actor) noexcept {
@@ -320,6 +355,8 @@ void StudentWorld::Stage::init() {
 	for (int spawnGold = 0; spawnGold < m_studentWorldPointer->m_stats.getGold(); spawnGold++) {
 		spawnActor<GoldNugget>();
 	}
+
+	//spawnActor<SonarKit>();
 }
 /*
  void StudentWorld::Stage::init(OilField myField) {
@@ -343,6 +380,18 @@ void StudentWorld::Stage::init() {
  }
  */
 void StudentWorld::Stage::move() {
+
+	//if (rand() % m_studentWorldPointer->m_stats.getGoodies() == 0) {
+	//	if (rand() % 5 == 0) {
+	//		spawnActor<SonarKit>();
+	//	}
+	//	else {
+	//		spawnActor<WaterPool>();
+	//	}
+	//}
+
+	//spawning SonarKit in move causes error, whereas spawning in init does not when deleting it
+
 	auto it = self.begin();
 	while (it != self.end()) {
 		if (*it != nullptr) {
